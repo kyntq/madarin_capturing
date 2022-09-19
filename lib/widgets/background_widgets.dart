@@ -19,13 +19,14 @@ class _BackgroundState extends State<Background> {
   void initializeGame() {
     currentPlayer = PLAYER_1;
     endGame = false;
-    listBoard = [
+    listBoard = [Box(1, true),
+
       Box(5, false),
       Box(5, false),
       Box(5, false),
       Box(5, false),
       Box(5, false),
-      Box(1, true),
+
       Box(5, false),
       Box(5, false),
       Box(5, false),
@@ -57,11 +58,15 @@ class _BackgroundState extends State<Background> {
             crossAxisAlignment: CrossAxisAlignment.center,
             mainAxisAlignment: MainAxisAlignment.spaceAround,
             children: [
-              const Text(
-                'Player 1',
-                style: TextStyle(fontSize: 23, fontWeight: FontWeight.bold),
+              Text(
+                'Player 2',
+                style: TextStyle(
+                    fontSize: 23,
+                    fontWeight: FontWeight.bold,
+                    color:
+                        currentPlayer == PLAYER_2 ? Colors.red : Colors.black),
               ),
-              Text('Score: $Score1',
+              Text('Score: $Score2',
                   style: const TextStyle(
                       fontSize: 23, fontWeight: FontWeight.bold)),
             ],
@@ -74,14 +79,22 @@ class _BackgroundState extends State<Background> {
           decoration: BoxDecoration(
               border: Border.all(width: 1, color: Colors.black87),
               borderRadius: BorderRadius.circular(15)),
-          child: GridView.count(
-            crossAxisCount: 6,
-            mainAxisSpacing: 20,
-            crossAxisSpacing: 20,
-            childAspectRatio: 1,
-            children:
-                listBoard.map((e) => singleBox(listBoard.indexOf(e))).toList(),
-          ),
+          child:
+          GridView.count(
+              crossAxisCount: 6,
+              mainAxisSpacing: 20,
+              crossAxisSpacing: 20,
+              childAspectRatio:  1,
+              children: [
+                ...listBoard.map((e) {
+                  return singleBox(listBoard.indexOf(e), e.isMandari);
+                })
+              ]),
+          // GridView.builder(gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+          //     crossAxisCount: 6),
+          //     itemBuilder: (BuildContext context, int index) {
+          //
+          //     })
         ),
         SizedBox(
           height: deviceSize.height / 5,
@@ -90,13 +103,23 @@ class _BackgroundState extends State<Background> {
             crossAxisAlignment: CrossAxisAlignment.center,
             mainAxisAlignment: MainAxisAlignment.spaceAround,
             children: [
-              const Text(
-                'Player 2',
-                style: TextStyle(fontSize: 23, fontWeight: FontWeight.bold),
-              ),
-              Text('Score: $Score2}',
+              Text('Player 1',
+                  style: TextStyle(
+                      fontSize: 23,
+                      fontWeight: FontWeight.bold,
+                      color: currentPlayer == PLAYER_1
+                          ? Colors.red
+                          : Colors.black)),
+              Text('Score: $Score1',
                   style: const TextStyle(
                       fontSize: 23, fontWeight: FontWeight.bold)),
+              IconButton(
+                  onPressed: () {
+                    setState(() {
+                      initializeGame();
+                    });
+                  },
+                  icon: Icon(Icons.restart_alt))
             ],
           ),
         ),
@@ -180,9 +203,14 @@ class _BackgroundState extends State<Background> {
   }
 
   checkForWin() {
-    if (listBoard[5].score == 0 || listBoard[11].score == 0) {
+    String msg = '';
+    if (listBoard[0].score == 0 || listBoard[11].score == 0) {
       endGame = true;
-      showGameOverMessage("End game");
+      if (Score1 > Score2) {
+        msg = 'Người chơi 1 chiến thắng với số điểm $Score1'
+            '\nNgười chơi 2 thua cuộc với số điểm $Score2';
+      }
+      showGameOverMessage(msg);
       return;
     }
   }
@@ -201,9 +229,10 @@ class _BackgroundState extends State<Background> {
     );
   }
 
-  Widget singleBox(index) {
+  Widget singleBox(index, bool isMandari) {
     return InkWell(
       onTap: () {
+        if (endGame) return;
         showDialog(
             context: context,
             builder: (context) => AlertDialog(
@@ -213,11 +242,14 @@ class _BackgroundState extends State<Background> {
                       child: const Text('Left'),
                       onPressed: () {
                         setState(() {
+                          changeTurn();
+                          checkScattered();
                           if (index <= 5) {
-                            Score1 = directLeft(index);
+                            Score1 += directLeft(index);
                           } else {
-                            Score2 = directLeft(index);
+                            Score2 += directLeft(index);
                           }
+                          checkForWin();
                         });
                         Navigator.of(context).pop();
                       },
@@ -225,12 +257,16 @@ class _BackgroundState extends State<Background> {
                     FlatButton(
                       child: const Text('Right'),
                       onPressed: () {
+                        if (endGame) return;
                         setState(() {
+                          changeTurn();
+                          checkScattered();
                           if (index <= 5) {
-                            Score1 = directRight(index);
+                            Score1 += directRight(index);
                           } else {
-                            Score2 = directRight(index);
+                            Score2 += directRight(index);
                           }
+                          checkForWin();
                         });
                         Navigator.of(context).pop();
                       },
@@ -240,7 +276,10 @@ class _BackgroundState extends State<Background> {
       },
       splashColor: Colors.redAccent,
       highlightColor: Colors.white,
-      child: Container(
+      child: isMandari ? Expanded(child: Container(
+        height: 20,
+        color: Colors.red,
+      )) :Container(
         decoration: BoxDecoration(
             color: listBoard[index].isMandari ? Colors.red : Colors.blue,
             borderRadius: BorderRadius.circular(15),
@@ -256,5 +295,50 @@ class _BackgroundState extends State<Background> {
             )),
       ),
     );
+  }
+
+  void checkScattered() {
+    int temp1 = 0;
+    int temp2 = 0;
+    for (int i = 1; i <= 5; i++) {
+      temp1 += listBoard[i].score;
+    }
+    for (int i = 6; i < 11; i++) {
+      temp2 += listBoard[i].score;
+    }
+
+    if ((temp1 == 0) && (listBoard[0].score != 0 || listBoard[11].score != 0)) {
+      // rai cho team 1
+      scattered('1');
+    }
+    if ((temp1 == 0) && (listBoard[0].score != 0 || listBoard[11].score != 0)) {
+      // rai cho team 2
+      scattered('2');
+    }
+  }
+
+  void scattered(String team) {
+    if (team.compareTo('1') == 0) {
+      //rai cho team 1
+      Score1 -= 5;
+      if (Score1 < 0) {
+        endGame = true;
+        return;
+      }
+      for (int i = 0; i < 5; i++) {
+        listBoard[i].score++;
+      }
+    }
+    if (team.compareTo('2') == 0) {
+      //rai cho team 2
+      Score2 -= 5;
+      if (Score1 < 0) {
+        endGame = true;
+        return;
+      }
+      for (int i = 6; i < 11; i++) {
+        listBoard[i].score++;
+      }
+    }
   }
 }
