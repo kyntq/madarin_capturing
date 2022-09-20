@@ -18,17 +18,8 @@ class MyApp extends StatelessWidget {
       DeviceOrientation.landscapeRight,
     ]);
 
-    return MultiProvider(
-      providers: [
-        ChangeNotifierProvider.value(
-          value: Board(),
-        ),
-        ChangeNotifierProvider(create: (context) => Player1()),
-        ChangeNotifierProvider(create: (context) => Player2())
-      ],
-      child: MaterialApp(
-        home: Background(),
-      ),
+    return MaterialApp(
+      home: Background(),
     );
   }
 }
