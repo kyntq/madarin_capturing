@@ -2,6 +2,7 @@ import 'dart:async';
 import 'dart:ui';
 
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 
 import '../models/box.dart';
 
@@ -18,6 +19,7 @@ class _BackgroundState extends State<Background> {
   late bool endGame;
   late String currentPlayer;
   late List<Box> listBoard;
+  var mIndex = -1;
 
   void initializeGame() {
     currentPlayer = PLAYER_1;
@@ -26,23 +28,29 @@ class _BackgroundState extends State<Background> {
     score2 = 0;
 
     listBoard = [
-      Box(5, false, Colors.blue), //2
-      Box(5, false, Colors.blue), //3
-      Box(5, false, Colors.blue), //4
-      Box(5, false, Colors.blue), //5
-      Box(5, false, Colors.blue),
-      Box(1, true, Colors.red),
-      Box(5, false, Colors.blue), //7
-      Box(5, false, Colors.blue), //9
-      Box(5, false, Colors.blue), //10
-      Box(5, false, Colors.blue), //11
-      Box(5, false, Colors.blue),
-      Box(1, true, Colors.red),
+      Box(5, false, Colors.blue, false), //2
+      Box(5, false, Colors.blue, false), //3
+      Box(5, false, Colors.blue, false), //4
+      Box(5, false, Colors.blue, false), //5
+      Box(5, false, Colors.blue, false),
+      Box(1, true, Colors.red, false),
+      Box(5, false, Colors.blue, false), //7
+      Box(5, false, Colors.blue, false), //9
+      Box(5, false, Colors.blue, false), //10
+      Box(5, false, Colors.blue, false), //11
+      Box(5, false, Colors.blue, false),
+      Box(1, true, Colors.red, false),
     ];
   }
 
   @override
   void initState() {
+    SystemChrome.setEnabledSystemUIMode(SystemUiMode.manual, overlays: [
+      SystemUiOverlay.bottom
+    ]);
+    SystemChrome.setSystemUIOverlayStyle(const SystemUiOverlayStyle(
+      statusBarColor: Colors.transparent,
+    ));
     initializeGame();
     super.initState();
   }
@@ -54,31 +62,80 @@ class _BackgroundState extends State<Background> {
     return Column(
       children: [
         const SizedBox(height: 24),
-        Row(
-          crossAxisAlignment: CrossAxisAlignment.center,
-          mainAxisAlignment: MainAxisAlignment.spaceAround,
-          children: [
-            Text(
-              'Player 2',
-              style: TextStyle(
-                  fontSize: 23,
-                  fontWeight: FontWeight.bold,
-                  color: currentPlayer == PLAYER_2 ? Colors.red : Colors.black),
-            ),
-            Text('Score: $score2', style: const TextStyle(fontSize: 23, fontWeight: FontWeight.bold)),
-          ],
+        AbsorbPointer(
+          absorbing: currentPlayer == PLAYER_1,
+          child: Row(
+            crossAxisAlignment: CrossAxisAlignment.center,
+            mainAxisAlignment: MainAxisAlignment.spaceAround,
+            children: [
+              RotatedBox(
+                quarterTurns: 2,
+                child: Text(
+                  'Player 2',
+                  style: TextStyle(
+                      fontSize: 23,
+                      fontWeight: FontWeight.bold,
+                      color: currentPlayer == PLAYER_2 ? Colors.lightBlue : Colors.black),
+                ),
+              ),
+              RotatedBox(
+                quarterTurns: 2,
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  crossAxisAlignment: CrossAxisAlignment.center,
+                  children: [
+                    IconButton(onPressed: () {
+                      if (mIndex < 0) return;
+                      clickRight(mIndex);
+                    }, icon: const Icon(Icons.arrow_right, size: 48,)),
+                    Text('DẢI SANG TRÁI')
+                  ],
+                ),
+              ),
+              RotatedBox(
+                quarterTurns: 2,
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  crossAxisAlignment: CrossAxisAlignment.center,
+                  children: [
+                    IconButton(onPressed: () {
+                      if (mIndex < 0) return;
+                      clickLeft(mIndex);
+                    }, icon: const Icon(Icons.arrow_left, size: 48)),
+                    Text('DẢI SANG PHẢI')
+                  ],
+                ),
+              ),
+              RotatedBox(
+                quarterTurns: 2,
+                child: Text('Score: $score2', style: TextStyle(fontSize: 23,
+                    color: currentPlayer == PLAYER_2 ? Colors.lightBlue : Colors.black,
+                    fontWeight: FontWeight.bold)),
+              ),
+            ],
+          ),
         ),
         const SizedBox(height: 24),
         Expanded(
           child: Row(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
+              RotatedBox(
+                quarterTurns: 2,
+                child: IconButton(
+                    onPressed: () {
+                      setState(() {
+                        initializeGame();
+                      });
+                    },
+                    icon: const Icon(Icons.restart_alt, size: 36)),
+              ),
+              const SizedBox(width: 24),
               AbsorbPointer(
                   child: SizedBox(width: 120, child: singleBox(11, listBoard[11].isMandari, isLeft: true)),
                   absorbing: true),
               Container(
                 width: itemWidth,
-                color: Colors.blue,
                 child: Column(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
@@ -89,7 +146,7 @@ class _BackgroundState extends State<Background> {
                         shrinkWrap: true,
                         itemCount: 5,
                         gridDelegate:
-                            const SliverGridDelegateWithFixedCrossAxisCount(crossAxisCount: 5, childAspectRatio: .889),
+                            const SliverGridDelegateWithFixedCrossAxisCount(crossAxisCount: 5, childAspectRatio: 1),
                         itemBuilder: (BuildContext context, int index) {
                           // print('============= ${listBoard[index].color.toString()}');
                           return singleBox(index, listBoard[index].isMandari);
@@ -104,7 +161,7 @@ class _BackgroundState extends State<Background> {
                         itemCount: 5,
                         reverse: false,
                         gridDelegate:
-                            const SliverGridDelegateWithFixedCrossAxisCount(crossAxisCount: 5, childAspectRatio: .889),
+                            const SliverGridDelegateWithFixedCrossAxisCount(crossAxisCount: 5, childAspectRatio: 1),
                         itemBuilder: (BuildContext context, int index) {
                           // print('============= ${listBoard[index].color.toString()}');
                           return singleBox(index + 6, listBoard[index + 6].isMandari);
@@ -115,30 +172,61 @@ class _BackgroundState extends State<Background> {
                 ),
               ),
               AbsorbPointer(child: SizedBox(width: 120, child: singleBox(5, listBoard[5].isMandari)), absorbing: true),
+              const SizedBox(width: 24),
+              IconButton(
+                  onPressed: () {
+                    setState(() {
+                      initializeGame();
+                    });
+                  },
+                  icon: const Icon(Icons.restart_alt, size: 36)),
             ],
           ),
         ),
         const SizedBox(height: 24),
-        Row(
-          crossAxisAlignment: CrossAxisAlignment.center,
-          mainAxisAlignment: MainAxisAlignment.spaceAround,
-          children: [
-            Text('Player 1',
-                style: TextStyle(
-                    fontSize: 23,
-                    fontWeight: FontWeight.bold,
-                    color: currentPlayer == PLAYER_1 ? Colors.red : Colors.black)),
-            Text('Score: $score1', style: const TextStyle(fontSize: 23, fontWeight: FontWeight.bold)),
-            IconButton(
-                onPressed: () {
-                  setState(() {
-                    initializeGame();
-                  });
-                },
-                icon: const Icon(Icons.restart_alt))
-          ],
+        AbsorbPointer(
+          absorbing: currentPlayer == PLAYER_2,
+          child: Row(
+            crossAxisAlignment: CrossAxisAlignment.center,
+            mainAxisAlignment: MainAxisAlignment.spaceAround,
+            children: [
+              Text('Player 1',
+                  style: TextStyle(
+                      fontSize: 23,
+                      fontWeight: FontWeight.bold,
+                      color: currentPlayer == PLAYER_1 ? Colors.lightBlue : Colors.black)),
+              Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                crossAxisAlignment: CrossAxisAlignment.center,
+                children: [
+                  IconButton(onPressed: () {
+                    if (mIndex < 0) return;
+                    clickLeft(mIndex);
+                  }, icon: const Icon(Icons.arrow_left, size: 48,)),
+                  Text('DẢI SANG TRÁI')
+                ],
+              ),
+              Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                crossAxisAlignment: CrossAxisAlignment.center,
+                children: [
+                  IconButton(onPressed: () {
+                    if (mIndex < 0) return;
+                    clickRight(mIndex);
+                  }, icon: const Icon(Icons.arrow_right, size: 48)),
+
+                  Text('DẢI SANG PHẢI')
+                ],
+              ),
+
+              Text('Score: $score1', style: TextStyle(
+                  fontSize: 23,
+                  color: currentPlayer == PLAYER_1 ? Colors.lightBlue : Colors.black,
+                  fontWeight: FontWeight.bold)),
+            ],
+          ),
         ),
-        const SizedBox(height: 24),
+        const SizedBox(height: 16),
       ],
     );
   }
@@ -186,6 +274,7 @@ class _BackgroundState extends State<Background> {
         }
 
         if (stop) {
+          changeTurn();
           timer.cancel();
           while (listBoard[i + 1 == 12 ? 0 : i + 1].score == 0 &&
               listBoard[i + 2 == 12 ? 0 : i + 2].score != 0 &&
@@ -242,6 +331,7 @@ class _BackgroundState extends State<Background> {
           }
         }
         if (stop) {
+          changeTurn();
           timer.cancel();
           if (listBoard[i - 1 == -1 ? 11 : i - 1].score == 0 &&
               listBoard[i - 2 == -1 ? 11 : i - 2].score != 0 &&
@@ -266,6 +356,9 @@ class _BackgroundState extends State<Background> {
   }
 
   void changeTurn() {
+    for (int i = 0; i< listBoard.length; i++) {
+      listBoard[i].selected = false;
+    }
     if (currentPlayer == PLAYER_1) {
       currentPlayer = PLAYER_2;
     } else {
@@ -313,7 +406,14 @@ class _BackgroundState extends State<Background> {
     return InkWell(
       onTap: () {
         if (endGame || listBoard[index].score == 0) return;
-        showDialog(
+        setState(() {
+          mIndex = index;
+          for (int i = 0; i< listBoard.length; i++) {
+            listBoard[i].selected = false;
+          }
+          listBoard[mIndex].selected = true;
+        });
+        /*showDialog(
             context: context,
             builder: (context) => AlertDialog(
                   title: const Text('Chose your direct?'),
@@ -343,31 +443,60 @@ class _BackgroundState extends State<Background> {
                       },
                     ),
                   ],
-                ));
+                ));*/
       },
       child: Container(
         decoration: BoxDecoration(
             color: listBoard[index].score == 0
                 ? Colors.grey
-                : listBoard[index].color,
+                : listBoard[index].selected ? Colors.lightBlue : listBoard[index].color,
             borderRadius: isMandari ? radius : BorderRadius.zero,
             border: Border.all(width: .5, color: Colors.black)),
         child: Align(
             alignment: Alignment.center,
-            child: Text(
-              '[$index]\n'
-              '${listBoard[index].score}',
-              style: TextStyle(
-                fontWeight: FontWeight.bold,
-                fontSize: isMandari ? 38 : 32,
-              ),
-              textAlign: TextAlign.center,
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                RotatedBox(
+                  quarterTurns: 2,
+                  child: Text(
+                    '${listBoard[index].score}',
+                    style: TextStyle(
+                      fontWeight: FontWeight.bold,
+                      fontSize: currentPlayer == PLAYER_2 ? 38 : 12
+                    ),
+                    textAlign: TextAlign.center,
+                  ),
+                ),
+                Text(
+                  '${listBoard[index].score}',
+                  style: TextStyle(
+                    fontWeight: FontWeight.bold,
+                    fontSize: currentPlayer == PLAYER_1 ? 38 : 12,
+                  ),
+                  textAlign: TextAlign.center,
+                ),
+              ],
             )),
       ),
     );
   }
 
-  void checkTurn() {}
+  void clickLeft(int index) {
+    setState(() {
+      checkScattered();
+      directLeft_cf(index);
+      checkForWin();
+    });
+  }
+
+  void clickRight(int index) {
+    setState(() {
+      checkScattered();
+      directRight_cf(index);
+      checkForWin();
+    });
+  }
 
   void checkScattered() {
     int temp1 = 0;
