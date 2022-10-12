@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:ui';
 
 import 'package:flutter/material.dart';
 
@@ -12,8 +13,8 @@ class Background extends StatefulWidget {
 class _BackgroundState extends State<Background> {
   static const String PLAYER_1 = "Người chơi 1";
   static const String PLAYER_2 = "Người chơi 2";
-  int Score1 = 0;
-  int Score2 = 0;
+  int score1 = 0;
+  int score2 = 0;
   late bool endGame;
   late String currentPlayer;
   late List<Box> listBoard;
@@ -21,8 +22,8 @@ class _BackgroundState extends State<Background> {
   void initializeGame() {
     currentPlayer = PLAYER_1;
     endGame = false;
-    Score1 = 0;
-    Score2 = 0;
+    score1 = 0;
+    score2 = 0;
 
     listBoard = [
       Box(5, false, Colors.blue), //2
@@ -42,159 +43,125 @@ class _BackgroundState extends State<Background> {
 
   @override
   void initState() {
-    // TODO: implement initState
     initializeGame();
     super.initState();
   }
 
   @override
   Widget build(BuildContext context) {
-    print('=================');
     Size deviceSize = MediaQuery.of(context).size;
-    return Scaffold(
-        body: SafeArea(
-            child: Column(
-      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+    final double itemWidth = deviceSize.width / 2;
+    return Column(
       children: [
-        SizedBox(
-          height: (deviceSize.height / 5) - 50,
-          width: double.infinity,
+        const SizedBox(height: 24),
+        Row(
+          crossAxisAlignment: CrossAxisAlignment.center,
+          mainAxisAlignment: MainAxisAlignment.spaceAround,
+          children: [
+            Text(
+              'Player 2',
+              style: TextStyle(
+                  fontSize: 23,
+                  fontWeight: FontWeight.bold,
+                  color: currentPlayer == PLAYER_2 ? Colors.red : Colors.black),
+            ),
+            Text('Score: $score2', style: const TextStyle(fontSize: 23, fontWeight: FontWeight.bold)),
+          ],
+        ),
+        const SizedBox(height: 24),
+        Expanded(
           child: Row(
-            crossAxisAlignment: CrossAxisAlignment.center,
-            mainAxisAlignment: MainAxisAlignment.spaceAround,
+            mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              Text(
-                'Player 2',
+              AbsorbPointer(
+                  child: SizedBox(width: 120, child: singleBox(11, listBoard[11].isMandari, isLeft: true)),
+                  absorbing: true),
+              Container(
+                width: itemWidth,
+                color: Colors.blue,
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    AbsorbPointer(
+                      absorbing: currentPlayer == PLAYER_1,
+                      child: GridView.builder(
+                        physics: const NeverScrollableScrollPhysics(),
+                        shrinkWrap: true,
+                        itemCount: 5,
+                        gridDelegate:
+                            const SliverGridDelegateWithFixedCrossAxisCount(crossAxisCount: 5, childAspectRatio: .889),
+                        itemBuilder: (BuildContext context, int index) {
+                          // print('============= ${listBoard[index].color.toString()}');
+                          return singleBox(index, listBoard[index].isMandari);
+                        },
+                      ),
+                    ),
+                    AbsorbPointer(
+                      absorbing: currentPlayer == PLAYER_2,
+                      child: GridView.builder(
+                        shrinkWrap: true,
+                        physics: const NeverScrollableScrollPhysics(),
+                        itemCount: 5,
+                        reverse: false,
+                        gridDelegate:
+                            const SliverGridDelegateWithFixedCrossAxisCount(crossAxisCount: 5, childAspectRatio: .889),
+                        itemBuilder: (BuildContext context, int index) {
+                          // print('============= ${listBoard[index].color.toString()}');
+                          return singleBox(index + 6, listBoard[index + 6].isMandari);
+                        },
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              AbsorbPointer(child: SizedBox(width: 120, child: singleBox(5, listBoard[5].isMandari)), absorbing: true),
+            ],
+          ),
+        ),
+        const SizedBox(height: 24),
+        Row(
+          crossAxisAlignment: CrossAxisAlignment.center,
+          mainAxisAlignment: MainAxisAlignment.spaceAround,
+          children: [
+            Text('Player 1',
                 style: TextStyle(
                     fontSize: 23,
                     fontWeight: FontWeight.bold,
-                    color:
-                        currentPlayer == PLAYER_2 ? Colors.red : Colors.black),
-              ),
-              Text('Score: $Score2',
-                  style: const TextStyle(
-                      fontSize: 23, fontWeight: FontWeight.bold)),
-            ],
-          ),
-        ),
-        Row(
-          children: [
-            Container(
-                width: 90,
-                height: 130,
-                child: singleBox(11, listBoard[11].isMandari)),
-            SizedBox(
-              width: 10,
-            ),
-            Expanded(
-              child: Column(
-                children: [
-                  GridView.builder(
-                    physics: NeverScrollableScrollPhysics(),
-                    shrinkWrap: true,
-                    itemCount: 5,
-                    gridDelegate:
-                        const SliverGridDelegateWithFixedCrossAxisCount(
-                            crossAxisCount: 5),
-                    itemBuilder: (BuildContext context, int index) {
-                      print(
-                          '============= ${listBoard[index].color.toString()}');
-                      return singleBox(index, listBoard[index].isMandari);
-                    },
-                  ),
-                  GridView.builder(
-                    shrinkWrap: true,
-                    physics: NeverScrollableScrollPhysics(),
-                    itemCount: 5,
-                    reverse: false,
-                    gridDelegate:
-                        const SliverGridDelegateWithFixedCrossAxisCount(
-                            crossAxisCount: 5),
-                    itemBuilder: (BuildContext context, int index) {
-                      print(
-                          '============= ${listBoard[index].color.toString()}');
-                      return singleBox(
-                          index + 6, listBoard[index + 6].isMandari);
-                    },
-                  ),
-                ],
-              ),
-            ),
-            SizedBox(
-              width: 10,
-            ),
-            Container(
-                width: 90,
-                height: 130,
-                child: singleBox(5, listBoard[5].isMandari)),
+                    color: currentPlayer == PLAYER_1 ? Colors.red : Colors.black)),
+            Text('Score: $score1', style: const TextStyle(fontSize: 23, fontWeight: FontWeight.bold)),
+            IconButton(
+                onPressed: () {
+                  setState(() {
+                    initializeGame();
+                  });
+                },
+                icon: const Icon(Icons.restart_alt))
           ],
         ),
-        // Container(
-        //     margin: const EdgeInsets.symmetric(horizontal: 20),
-        //     width: double.infinity,
-        //     height: deviceSize.height * 0.45 + 30,
-        //     decoration: BoxDecoration(
-        //         border: Border.all(width: 1, color: Colors.black87),
-        //         borderRadius: BorderRadius.circular(15)),
-        //     // GridView.builder(
-        //     //     itemBuilder: 10,
-        //     //     gridDelegate: ,
-        //     //     crossAxisCount: 5,
-        //     //     mainAxisSpacing: 20,
-        //     //     crossAxisSpacing: 20,
-        //     //     childAspectRatio: 1,
-        //     //     children: [
-        //     //       ...listBoard.map((e) {
-        //     //         return singleBox(listBoard.indexOf(e), e.isMandari);
-        //     //       })
-        //     //     ]),
-        //     ),
-        SizedBox(
-          height: deviceSize.height / 5,
-          width: double.infinity,
-          child: Row(
-            crossAxisAlignment: CrossAxisAlignment.center,
-            mainAxisAlignment: MainAxisAlignment.spaceAround,
-            children: [
-              Text('Player 1',
-                  style: TextStyle(
-                      fontSize: 23,
-                      fontWeight: FontWeight.bold,
-                      color: currentPlayer == PLAYER_1
-                          ? Colors.red
-                          : Colors.black)),
-              Text('Score: $Score1',
-                  style: const TextStyle(
-                      fontSize: 23, fontWeight: FontWeight.bold)),
-              IconButton(
-                  onPressed: () {
-                    setState(() {
-                      initializeGame();
-                    });
-                  },
-                  icon: const Icon(Icons.restart_alt))
-            ],
-          ),
-        ),
+        const SizedBox(height: 24),
       ],
-    )));
+    );
   }
 
   var stop = false;
 
   // Game process
   void directLeft_cf(int index) {
-
     stop = false;
     int boc = listBoard[index].score;
     int i = index;
     int score = 0;
     listBoard[index].score = 0;
 
-    Timer.periodic(Duration(seconds: 1), (timer) {
+    Timer.periodic(const Duration(milliseconds: 750), (timer) {
       try {
         // listBoard[i].color = Colors.orange;
-        setState(() {});
+        setState(() {
+          var iYellow = i+1>11?0:i+1;
+          var iBlue = i>11?0:i;
+          listBoard[iYellow].color = Colors.yellow;
+          listBoard[iBlue].color = listBoard[iBlue].isMandari ? Colors.red : Colors.blue;
+        });
         print('${timer.tick}');
         if (boc > 0) {
           boc--;
@@ -202,13 +169,14 @@ class _BackgroundState extends State<Background> {
           if (i == 12) i = 0;
           listBoard[i].score++;
           if (boc == 0) {
-            if (!listBoard[i + 1 == 12 ? 0 : i + 1].isMandari &&
-                listBoard[i + 1 == 12 ? 0 : i + 1].score != 0) {
+            if (!listBoard[i + 1 == 12 ? 0 : i + 1].isMandari && listBoard[i + 1 == 12 ? 0 : i + 1].score != 0) {
               i++;
+              listBoard[i-1>11?0:i-1].color = listBoard[i-1>11?0:i-1].isMandari ? Colors.red : Colors.blue;
               if (i == 12) i = 0;
               boc = listBoard[i].score;
               listBoard[i].score = 0;
             } else {
+              listBoard[i].color = listBoard[i].isMandari ? Colors.red : Colors.blue;
               stop = true;
               print('stop 2');
             }
@@ -229,49 +197,15 @@ class _BackgroundState extends State<Background> {
             listBoard[i].score = 0;
           }
           if (currentPlayer == PLAYER_1) {
-            Score1 = score;
+            score1 = score;
           } else {
-            Score2 = score;
+            score2 = score;
           }
         }
       } catch (e) {
         timer.cancel();
       }
     });
-
-    // =======================
-    // while (boc > 0)  {
-    //   boc--;
-    //   i++;
-    //   print('$i');
-    //
-    //   if (i == 12) i = 0;
-    //   listBoard[i].score++;
-    //   if (boc == 0) {
-    //     if (!listBoard[i + 1 == 12 ? 0 : i + 1].isMandari &&
-    //         listBoard[i + 1 == 12 ? 0 : i + 1].score != 0) {
-    //       i++;
-    //       if (i == 12) i = 0;
-    //       boc = listBoard[i].score;
-    //       listBoard[i].score = 0;
-    //     }
-    //   }
-    // }
-    // while (listBoard[i + 1 == 12 ? 0 : i + 1].score == 0 &&
-    //     listBoard[i + 2 == 12 ? 0 : i + 2].score != 0 &&
-    //     !listBoard[i + 1 == 12 ? 0 : i + 1].isMandari) {
-    //   i = i + 1 == 12 ? 0 : i + 1;
-    //   i = i + 1 == 12 ? 0 : i + 1;
-    //   if (listBoard[i].isMandari) score += 9;
-    //   score += listBoard[i].score;
-    //   listBoard[i].score = 0;
-    // }
-    //
-    // if (currentPlayer == PLAYER_1) {
-    //   Score1 = score;
-    // } else {
-    //   Score2 = score;
-    // }
   }
 
   void directRight_cf(int index) {
@@ -281,37 +215,52 @@ class _BackgroundState extends State<Background> {
     int score = 0;
     listBoard[index].score = 0;
 
-    Timer.periodic(Duration(seconds: 1), (timer) {
-      setState(() {});
-      if (boc > 0) {
-        boc--;
-        i--;
-        if (i == -1) i = 11;
-        listBoard[i].score++;
-        if (boc == 0) {
-          if (!listBoard[i - 1 == -1 ? 11 : i - 1].isMandari &&
-              listBoard[i - 1 == -1 ? 11 : i - 1].score != 0) {
-            i--;
-            if (i == -1) i = 11;
-            boc = listBoard[i].score;
-            listBoard[i].score = 0;
+    Timer.periodic(const Duration(milliseconds: 750), (timer) {
+      try {
+        setState(() {
+          var iYellow = i-1<0?11:i-1;
+          var iBlue = i<0?11:i;
+          listBoard[iYellow].color = Colors.yellow;
+          listBoard[iBlue].color = listBoard[iBlue].isMandari ? Colors.red : Colors.blue;
+        });
+        if (boc > 0) {
+          boc--;
+          i--;
+          if (i == -1) i = 11;
+          listBoard[i].score++;
+          if (boc == 0) {
+            if (!listBoard[i - 1 == -1 ? 11 : i - 1].isMandari && listBoard[i - 1 == -1 ? 11 : i - 1].score != 0) {
+              i--;
+              listBoard[i+1<0?11:i+1].color = listBoard[i+1<0?11:i+1].isMandari ? Colors.red : Colors.blue;
+              if (i == -1) i = 11;
+              boc = listBoard[i].score;
+              listBoard[i].score = 0;
+            } else {
+              listBoard[i].color = listBoard[i].isMandari ? Colors.red : Colors.blue;
+              stop = true;
+            }
           }
         }
-      }
-      if (listBoard[i - 1 == -1 ? 11 : i - 1].score == 0 &&
-          listBoard[i - 2 == -1 ? 11 : i - 2].score != 0 &&
-          !listBoard[i - 1 == -1 ? 11 : i - 1].isMandari) {
-        i = i - 1 == -1 ? 11 : i - 1;
-        i = i - 1 == -1 ? 11 : i - 1;
-        if (listBoard[i].isMandari) score += 9;
-        score += listBoard[i].score;
-        listBoard[i].score = 0;
-      }
+        if (stop) {
+          timer.cancel();
+          if (listBoard[i - 1 == -1 ? 11 : i - 1].score == 0 &&
+              listBoard[i - 2 == -1 ? 11 : i - 2].score != 0 &&
+              !listBoard[i - 1 == -1 ? 11 : i - 1].isMandari) {
+            i = i - 1 == -1 ? 11 : i - 1;
+            i = i - 1 == -1 ? 11 : i - 1;
+            if (listBoard[i].isMandari) score += 9;
+            score += listBoard[i].score;
+            listBoard[i].score = 0;
+          }
 
-      if (currentPlayer == PLAYER_1) {
-        Score1 = score;
-      } else {
-        Score2 = score;
+          if (currentPlayer == PLAYER_1) {
+            score1 = score;
+          } else {
+            score2 = score;
+          }
+        }
+      } catch (e) {
+        timer.cancel();
       }
     });
   }
@@ -330,9 +279,9 @@ class _BackgroundState extends State<Background> {
     var temp2 = listBoard.lastWhere((element) => element.isMandari);
     if (temp.score == 0 && temp2.score == 0) {
       endGame = true;
-      if (Score1 > Score2) {
-        msg = 'Người chơi 1 chiến thắng với số điểm $Score1'
-            '\nNgười chơi 2 thua cuộc với số điểm $Score2';
+      if (score1 > score2) {
+        msg = 'Người chơi 1 chiến thắng với số điểm $score1'
+            '\nNgười chơi 2 thua cuộc với số điểm $score2';
       }
       showGameOverMessage(msg);
       return;
@@ -353,135 +302,72 @@ class _BackgroundState extends State<Background> {
     );
   }
 
-  Widget singleBox(index, bool isMandari) {
-    if(index > 5&& index < 11) {
-      index = 11- index +5;
+  Widget singleBox(index, bool isMandari, {bool? isLeft}) {
+    if (index > 5 && index < 11) {
+      index = 11 - index + 5;
     }
-    if (currentPlayer == PLAYER_1) {
-      return InkWell(
-        onTap: listBoard[index].score == 0 || index < 5
-            ? null
-            : () {
-                if (endGame) return;
-                showDialog(
-                    context: context,
-                    builder: (context) => AlertDialog(
-                          title: const Text('Chose your direct?'),
-                          actions: <Widget>[
-
-                            FlatButton(
-                              child: const Text('Left'),
-                              onPressed: () {
-                                if (endGame) return;
-                                Navigator.of(context).pop();
-                                setState(() {
-                                  changeTurn();
-                                  checkScattered();
-                                  directLeft_cf(index);
-                                  checkForWin();
-                                });
-                              },
-                            ),
-                            FlatButton(
-                              child: const Text('Right'),
-                              onPressed: () {
-                                setState(() {
-                                  changeTurn();
-                                  checkScattered();
-                                  directRight_cf(index);
-                                  checkForWin();
-                                });
-                                Navigator.of(context).pop();
-                              },
-                            ),
-                          ],
-                        ));
-              },
-        splashColor: Colors.redAccent,
-        highlightColor: Colors.white,
-        child: Container(
-          decoration: BoxDecoration(
-              color: listBoard[index].score == 0
-                  ? Colors.grey
-                  : (listBoard[index].color),
-              borderRadius: BorderRadius.circular(15),
-              border: Border.all(width: 5, color: Colors.black)),
-          child: Align(
-              alignment: Alignment.center,
-              child: Text(
-                // '$index',
-                '${listBoard[index].score}',
-                style: const TextStyle(
-                  fontWeight: FontWeight.bold,
-                  fontSize: 23,
-                ),
-              )),
-        ),
-      );
-    } else {
-      return InkWell(
-        onTap: listBoard[index].score == 0 || (index < 11 && index > 5)
-            ? null
-            : () {
-                if (endGame) return;
-                showDialog(
-                    context: context,
-                    builder: (context) => AlertDialog(
-                          title: const Text('Chose your direct?'),
-                          actions: <Widget>[
-                            FlatButton(
-                              child: const Text('Left'),
-                              onPressed: () {
-                                setState(() {
-                                  changeTurn();
-                                  checkScattered();
-                                  directRight_cf(index);
-
-                                  checkForWin();
-                                });
-                                Navigator.of(context).pop();
-                              },
-                            ),
-                            FlatButton(
-                              child: const Text('Right'),
-                              onPressed: () {
-                                if (endGame) return;
-                                setState(() {
-                                  changeTurn();
-                                  checkScattered();
-
-                                  directLeft_cf(index);
-                                  checkForWin();
-                                });
-                                Navigator.of(context).pop();
-                              },
-                            ),
-                          ],
-                        ));
-              },
-        splashColor: Colors.redAccent,
-        highlightColor: Colors.white,
-        child: Container(
-          decoration: BoxDecoration(
-              color: listBoard[index].score == 0
-                  ? Colors.grey
-                  : (listBoard[index].isMandari ? Colors.red : Colors.blue),
-              borderRadius: BorderRadius.circular(15),
-              border: Border.all(width: 5, color: Colors.black)),
-          child: Align(
-              alignment: Alignment.center,
-              child: Text(
-                // '$index',
-                '${listBoard[index].score}',
-                style: const TextStyle(
-                  fontWeight: FontWeight.bold,
-                  fontSize: 23,
-                ),
-              )),
-        ),
-      );
-    }
+    // if (currentPlayer == PLAYER_1) {
+    var radius = isLeft == true
+        ? const BorderRadius.only(bottomLeft: Radius.circular(36), topLeft: Radius.circular(36))
+        : const BorderRadius.only(bottomRight: Radius.circular(36), topRight: Radius.circular(36));
+    return InkWell(
+      onTap: () {
+        if (endGame || listBoard[index].score == 0) return;
+        showDialog(
+            context: context,
+            builder: (context) => AlertDialog(
+                  title: const Text('Chose your direct?'),
+                  actions: <Widget>[
+                    FlatButton(
+                      child: const Text('Left'),
+                      onPressed: () {
+                        setState(() {
+                          changeTurn();
+                          checkScattered();
+                          directLeft_cf(index);
+                          checkForWin();
+                        });
+                        Navigator.of(context).pop();
+                      },
+                    ),
+                    FlatButton(
+                      child: const Text('Right'),
+                      onPressed: () {
+                        setState(() {
+                          changeTurn();
+                          checkScattered();
+                          directRight_cf(index);
+                          checkForWin();
+                        });
+                        Navigator.of(context).pop();
+                      },
+                    ),
+                  ],
+                ));
+      },
+      child: Container(
+        decoration: BoxDecoration(
+            color: listBoard[index].score == 0
+                ? Colors.grey
+                : listBoard[index].color,
+            borderRadius: isMandari ? radius : BorderRadius.zero,
+            border: Border.all(width: .5, color: Colors.black)),
+        child: Align(
+            alignment: Alignment.center,
+            child: Text(
+              '[$index]\n'
+              '${listBoard[index].score}',
+              style: TextStyle(
+                fontWeight: FontWeight.bold,
+                fontSize: isMandari ? 38 : 32,
+              ),
+              textAlign: TextAlign.center,
+            )),
+      ),
+    );
   }
+
+  void checkTurn() {}
 
   void checkScattered() {
     int temp1 = 0;
@@ -506,8 +392,8 @@ class _BackgroundState extends State<Background> {
   void scattered(String team) {
     if (team.compareTo('1') == 0) {
       //rai cho team 1
-      Score1 -= 5;
-      if (Score1 < 0) {
+      score1 -= 5;
+      if (score1 < 0) {
         endGame = true;
         return;
       }
@@ -517,8 +403,8 @@ class _BackgroundState extends State<Background> {
     }
     if (team.compareTo('2') == 0) {
       //rai cho team 2
-      Score2 -= 5;
-      if (Score1 < 0) {
+      score2 -= 5;
+      if (score1 < 0) {
         endGame = true;
         return;
       }

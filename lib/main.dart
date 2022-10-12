@@ -19,7 +19,11 @@ class MyApp extends StatelessWidget {
     ]);
 
     return MaterialApp(
-      home: Background(),
+      home: Scaffold(
+        body: SafeArea(
+          child: Background(),
+        ),
+      ),
     );
   }
 }
