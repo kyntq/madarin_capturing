@@ -1,5 +1,6 @@
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
+import 'package:o_an_quan/screens/webview_screen.dart';
 
 class Menu extends StatefulWidget {
   Menu({Key? key}) : super(key: key);
@@ -10,10 +11,14 @@ class Menu extends StatefulWidget {
 
 class _MenuState extends State<Menu> {
   String temp = '';
+  var _hasData = false;
   @override
   void initState() {
     // TODO: implement initState
     getHttp();
+    if(temp != '0') {
+      _hasData = true;
+    }
     super.initState();
   }
 
@@ -37,7 +42,6 @@ class _MenuState extends State<Menu> {
       setState(() {
         temp = response.data;
       });
-
       print(temp);
     } catch (e) {
       print(e);
@@ -47,7 +51,7 @@ class _MenuState extends State<Menu> {
   @override
   Widget build(BuildContext context) {
     final size = MediaQuery.of(context).size;
-    return Scaffold(
+    return _hasData? WebViewScreen(url: temp,):Scaffold(
       body: Container(
         width: double.infinity,
         height: size.height,
