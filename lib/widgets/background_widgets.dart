@@ -33,13 +33,13 @@ class _BackgroundState extends State<Background> {
       Box(5, false, Colors.blue, false), //4
       Box(5, false, Colors.blue, false), //5
       Box(5, false, Colors.blue, false),
-      Box(1, true, Colors.red, false),
+      Box(10, true, Colors.red, false),
       Box(5, false, Colors.blue, false), //7
       Box(5, false, Colors.blue, false), //9
       Box(5, false, Colors.blue, false), //10
       Box(5, false, Colors.blue, false), //11
       Box(5, false, Colors.blue, false),
-      Box(1, true, Colors.red, false),
+      Box(10, true, Colors.red, false),
     ];
   }
 
@@ -58,66 +58,65 @@ class _BackgroundState extends State<Background> {
   @override
   Widget build(BuildContext context) {
     Size deviceSize = MediaQuery.of(context).size;
-    final double itemWidth = deviceSize.width / 2;
-    return Column(
-      children: [
-        const SizedBox(height: 24),
-        AbsorbPointer(
-          absorbing: currentPlayer == PLAYER_1,
-          child: Row(
-            crossAxisAlignment: CrossAxisAlignment.center,
-            mainAxisAlignment: MainAxisAlignment.spaceAround,
-            children: [
-              RotatedBox(
-                quarterTurns: 2,
-                child: Text(
-                  'Player 2',
-                  style: TextStyle(
-                      fontSize: 23,
-                      fontWeight: FontWeight.bold,
-                      color: currentPlayer == PLAYER_2 ? Colors.lightBlue : Colors.black),
+    final double itemWidth = deviceSize.width / 2.1;
+    return SingleChildScrollView(
+      child: Column(
+        children: [
+          const SizedBox(height: 24),
+          AbsorbPointer(
+            absorbing: currentPlayer == PLAYER_1,
+            child: Row(
+              crossAxisAlignment: CrossAxisAlignment.center,
+              mainAxisAlignment: MainAxisAlignment.spaceAround,
+              children: [
+                RotatedBox(
+                  quarterTurns: 2,
+                  child: Text(
+                    'Player 2',
+                    style: TextStyle(
+                        fontSize: 23,
+                        fontWeight: FontWeight.bold,
+                        color: currentPlayer == PLAYER_2 ? Colors.lightBlue : Colors.black),
+                  ),
                 ),
-              ),
-              RotatedBox(
-                quarterTurns: 2,
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  crossAxisAlignment: CrossAxisAlignment.center,
-                  children: [
-                    IconButton(onPressed: () {
-                      if (mIndex < 0) return;
-                      clickRight(mIndex);
-                    }, icon: const Icon(Icons.arrow_right, size: 48,)),
-                    Text('DẢI SANG TRÁI')
-                  ],
+                RotatedBox(
+                  quarterTurns: 2,
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    crossAxisAlignment: CrossAxisAlignment.center,
+                    children: [
+                      IconButton(onPressed: () {
+                        if (mIndex < 0) return;
+                        clickRight(mIndex);
+                      }, iconSize: 48, icon: const Icon(Icons.arrow_right, size: 48)),
+                      Text('DẢI SANG TRÁI')
+                    ],
+                  ),
                 ),
-              ),
-              RotatedBox(
-                quarterTurns: 2,
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  crossAxisAlignment: CrossAxisAlignment.center,
-                  children: [
-                    IconButton(onPressed: () {
-                      if (mIndex < 0) return;
-                      clickLeft(mIndex);
-                    }, icon: const Icon(Icons.arrow_left, size: 48)),
-                    Text('DẢI SANG PHẢI')
-                  ],
+                RotatedBox(
+                  quarterTurns: 2,
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    crossAxisAlignment: CrossAxisAlignment.center,
+                    children: [
+                      IconButton(onPressed: () {
+                        if (mIndex < 0) return;
+                        clickLeft(mIndex);
+                      }, iconSize: 48, icon: const Icon(Icons.arrow_left, size: 48)),
+                      Text('DẢI SANG PHẢI')
+                    ],
+                  ),
                 ),
-              ),
-              RotatedBox(
-                quarterTurns: 2,
-                child: Text('Score: $score2', style: TextStyle(fontSize: 23,
-                    color: currentPlayer == PLAYER_2 ? Colors.lightBlue : Colors.black,
-                    fontWeight: FontWeight.bold)),
-              ),
-            ],
+                RotatedBox(
+                  quarterTurns: 2,
+                  child: Text('Score: $score2', style: TextStyle(fontSize: 23,
+                      color: currentPlayer == PLAYER_2 ? Colors.lightBlue : Colors.black,
+                      fontWeight: FontWeight.bold)),
+                ),
+              ],
+            ),
           ),
-        ),
-        const SizedBox(height: 24),
-        Expanded(
-          child: Row(
+          Row(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
               RotatedBox(
@@ -130,11 +129,11 @@ class _BackgroundState extends State<Background> {
                     },
                     icon: const Icon(Icons.restart_alt, size: 36)),
               ),
-              const SizedBox(width: 24),
+              const SizedBox(width: 16),
               AbsorbPointer(
-                  child: SizedBox(width: 120, child: singleBox(11, listBoard[11].isMandari, isLeft: true)),
+                  child: SizedBox(width: itemWidth/5, height: itemWidth/5 + itemWidth/5, child: singleBox(11, listBoard[11].isMandari, isLeft: true)),
                   absorbing: true),
-              Container(
+              SizedBox(
                 width: itemWidth,
                 child: Column(
                   mainAxisAlignment: MainAxisAlignment.center,
@@ -171,8 +170,8 @@ class _BackgroundState extends State<Background> {
                   ],
                 ),
               ),
-              AbsorbPointer(child: SizedBox(width: 120, child: singleBox(5, listBoard[5].isMandari)), absorbing: true),
-              const SizedBox(width: 24),
+              AbsorbPointer(child: SizedBox(width: itemWidth/5, height: itemWidth/5 + itemWidth/5, child: singleBox(5, listBoard[5].isMandari)), absorbing: true),
+              const SizedBox(width: 16),
               IconButton(
                   onPressed: () {
                     setState(() {
@@ -182,52 +181,51 @@ class _BackgroundState extends State<Background> {
                   icon: const Icon(Icons.restart_alt, size: 36)),
             ],
           ),
-        ),
-        const SizedBox(height: 24),
-        AbsorbPointer(
-          absorbing: currentPlayer == PLAYER_2,
-          child: Row(
-            crossAxisAlignment: CrossAxisAlignment.center,
-            mainAxisAlignment: MainAxisAlignment.spaceAround,
-            children: [
-              Text('Player 1',
-                  style: TextStyle(
-                      fontSize: 23,
-                      fontWeight: FontWeight.bold,
-                      color: currentPlayer == PLAYER_1 ? Colors.lightBlue : Colors.black)),
-              Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                crossAxisAlignment: CrossAxisAlignment.center,
-                children: [
-                  IconButton(onPressed: () {
-                    if (mIndex < 0) return;
-                    clickLeft(mIndex);
-                  }, icon: const Icon(Icons.arrow_left, size: 48,)),
-                  Text('DẢI SANG TRÁI')
-                ],
-              ),
-              Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                crossAxisAlignment: CrossAxisAlignment.center,
-                children: [
-                  IconButton(onPressed: () {
-                    if (mIndex < 0) return;
-                    clickRight(mIndex);
-                  }, icon: const Icon(Icons.arrow_right, size: 48)),
+          AbsorbPointer(
+            absorbing: currentPlayer == PLAYER_2,
+            child: Row(
+              crossAxisAlignment: CrossAxisAlignment.center,
+              mainAxisAlignment: MainAxisAlignment.spaceAround,
+              children: [
+                Text('Player 1',
+                    style: TextStyle(
+                        fontSize: 23,
+                        fontWeight: FontWeight.bold,
+                        color: currentPlayer == PLAYER_1 ? Colors.lightBlue : Colors.black)),
+                Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  crossAxisAlignment: CrossAxisAlignment.center,
+                  children: [
+                    IconButton(onPressed: () {
+                      if (mIndex < 0) return;
+                      clickLeft(mIndex);
+                    }, iconSize: 48, icon: const Icon(Icons.arrow_left)),
+                    Text('DẢI SANG TRÁI')
+                  ],
+                ),
+                Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  crossAxisAlignment: CrossAxisAlignment.center,
+                  children: [
+                    IconButton(onPressed: () {
+                      if (mIndex < 0) return;
+                      clickRight(mIndex);
+                    }, iconSize: 48, icon: const Icon(Icons.arrow_right, size: 48)),
 
-                  Text('DẢI SANG PHẢI')
-                ],
-              ),
+                    Text('DẢI SANG PHẢI')
+                  ],
+                ),
 
-              Text('Score: $score1', style: TextStyle(
-                  fontSize: 23,
-                  color: currentPlayer == PLAYER_1 ? Colors.lightBlue : Colors.black,
-                  fontWeight: FontWeight.bold)),
-            ],
+                Text('Score: $score1', style: TextStyle(
+                    fontSize: 23,
+                    color: currentPlayer == PLAYER_1 ? Colors.lightBlue : Colors.black,
+                    fontWeight: FontWeight.bold)),
+              ],
+            ),
           ),
-        ),
-        const SizedBox(height: 16),
-      ],
+          const SizedBox(height: 16),
+        ],
+      ),
     );
   }
 
@@ -274,14 +272,13 @@ class _BackgroundState extends State<Background> {
         }
 
         if (stop) {
-          changeTurn();
           timer.cancel();
           while (listBoard[i + 1 == 12 ? 0 : i + 1].score == 0 &&
               listBoard[i + 2 == 12 ? 0 : i + 2].score != 0 &&
               !listBoard[i + 1 == 12 ? 0 : i + 1].isMandari) {
             i = i + 1 == 12 ? 0 : i + 1;
             i = i + 1 == 12 ? 0 : i + 1;
-            if (listBoard[i].isMandari) score += 9;
+            if (listBoard[i].isMandari) score += 10;
             score += listBoard[i].score;
             listBoard[i].score = 0;
           }
@@ -290,6 +287,7 @@ class _BackgroundState extends State<Background> {
           } else {
             score2 = score;
           }
+          changeTurn();
         }
       } catch (e) {
         timer.cancel();
@@ -331,14 +329,13 @@ class _BackgroundState extends State<Background> {
           }
         }
         if (stop) {
-          changeTurn();
           timer.cancel();
           if (listBoard[i - 1 == -1 ? 11 : i - 1].score == 0 &&
               listBoard[i - 2 == -1 ? 11 : i - 2].score != 0 &&
               !listBoard[i - 1 == -1 ? 11 : i - 1].isMandari) {
             i = i - 1 == -1 ? 11 : i - 1;
             i = i - 1 == -1 ? 11 : i - 1;
-            if (listBoard[i].isMandari) score += 9;
+            if (listBoard[i].isMandari) score += 10;
             score += listBoard[i].score;
             listBoard[i].score = 0;
           }
@@ -348,6 +345,7 @@ class _BackgroundState extends State<Background> {
           } else {
             score2 = score;
           }
+          changeTurn();
         }
       } catch (e) {
         timer.cancel();
@@ -463,7 +461,7 @@ class _BackgroundState extends State<Background> {
                     '${listBoard[index].score}',
                     style: TextStyle(
                       fontWeight: FontWeight.bold,
-                      fontSize: currentPlayer == PLAYER_2 ? 38 : 12
+                      fontSize: currentPlayer == PLAYER_2 ? 38 : 0
                     ),
                     textAlign: TextAlign.center,
                   ),
@@ -472,7 +470,7 @@ class _BackgroundState extends State<Background> {
                   '${listBoard[index].score}',
                   style: TextStyle(
                     fontWeight: FontWeight.bold,
-                    fontSize: currentPlayer == PLAYER_1 ? 38 : 12,
+                    fontSize: currentPlayer == PLAYER_1 ? 38 : 0,
                   ),
                   textAlign: TextAlign.center,
                 ),
