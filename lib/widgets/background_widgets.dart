@@ -2,6 +2,7 @@ import 'dart:async';
 import 'dart:ui';
 
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 
 import '../models/box.dart';
 
@@ -18,6 +19,7 @@ class _BackgroundState extends State<Background> {
   late bool endGame;
   late String currentPlayer;
   late List<Box> listBoard;
+  var mIndex = -1;
 
   void initializeGame() {
     currentPlayer = PLAYER_1;
@@ -26,60 +28,113 @@ class _BackgroundState extends State<Background> {
     score2 = 0;
 
     listBoard = [
-      Box(5, false, Colors.blue), //2
-      Box(5, false, Colors.blue), //3
-      Box(5, false, Colors.blue), //4
-      Box(5, false, Colors.blue), //5
-      Box(5, false, Colors.blue),
-      Box(1, true, Colors.red),
-      Box(5, false, Colors.blue), //7
-      Box(5, false, Colors.blue), //9
-      Box(5, false, Colors.blue), //10
-      Box(5, false, Colors.blue), //11
-      Box(5, false, Colors.blue),
-      Box(1, true, Colors.red),
+      Box(5, false, Colors.blue, false), //2
+      Box(5, false, Colors.blue, false), //3
+      Box(5, false, Colors.blue, false), //4
+      Box(5, false, Colors.blue, false), //5
+      Box(5, false, Colors.blue, false),
+      Box(10, true, Colors.red, false),
+      Box(5, false, Colors.blue, false), //7
+      Box(5, false, Colors.blue, false), //9
+      Box(5, false, Colors.blue, false), //10
+      Box(5, false, Colors.blue, false), //11
+      Box(5, false, Colors.blue, false),
+      Box(10, true, Colors.red, false),
     ];
   }
 
   @override
   void initState() {
+    SystemChrome.setEnabledSystemUIMode(SystemUiMode.manual, overlays: [
+      SystemUiOverlay.bottom
+    ]);
+    SystemChrome.setSystemUIOverlayStyle(const SystemUiOverlayStyle(
+      statusBarColor: Colors.transparent,
+    ));
     initializeGame();
     super.initState();
   }
 
   @override
   Widget build(BuildContext context) {
-    print('================= build');
     Size deviceSize = MediaQuery.of(context).size;
-    final double itemWidth = deviceSize.width / 2;
-    return Column(
-      children: [
-        const SizedBox(height: 24),
-        Row(
-          crossAxisAlignment: CrossAxisAlignment.center,
-          mainAxisAlignment: MainAxisAlignment.spaceAround,
-          children: [
-            Text(
-              'Player 2',
-              style: TextStyle(
-                  fontSize: 23,
-                  fontWeight: FontWeight.bold,
-                  color: currentPlayer == PLAYER_2 ? Colors.red : Colors.black),
+    final double itemWidth = deviceSize.width / 2.1;
+    return SingleChildScrollView(
+      child: Column(
+        children: [
+          const SizedBox(height: 24),
+          AbsorbPointer(
+            absorbing: currentPlayer == PLAYER_1,
+            child: Row(
+              crossAxisAlignment: CrossAxisAlignment.center,
+              mainAxisAlignment: MainAxisAlignment.spaceAround,
+              children: [
+                RotatedBox(
+                  quarterTurns: 2,
+                  child: Text(
+                    'Player 2',
+                    style: TextStyle(
+                        fontSize: 23,
+                        fontWeight: FontWeight.bold,
+                        color: currentPlayer == PLAYER_2 ? Colors.lightBlue : Colors.black),
+                  ),
+                ),
+                RotatedBox(
+                  quarterTurns: 2,
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    crossAxisAlignment: CrossAxisAlignment.center,
+                    children: [
+                      IconButton(onPressed: () {
+                        if (mIndex < 0) return;
+                        clickRight(mIndex);
+                      }, iconSize: 48, icon: const Icon(Icons.arrow_right, size: 48)),
+                      Text('DẢI SANG TRÁI')
+                    ],
+                  ),
+                ),
+                RotatedBox(
+                  quarterTurns: 2,
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    crossAxisAlignment: CrossAxisAlignment.center,
+                    children: [
+                      IconButton(onPressed: () {
+                        if (mIndex < 0) return;
+                        clickLeft(mIndex);
+                      }, iconSize: 48, icon: const Icon(Icons.arrow_left, size: 48)),
+                      Text('DẢI SANG PHẢI')
+                    ],
+                  ),
+                ),
+                RotatedBox(
+                  quarterTurns: 2,
+                  child: Text('Score: $score2', style: TextStyle(fontSize: 23,
+                      color: currentPlayer == PLAYER_2 ? Colors.lightBlue : Colors.black,
+                      fontWeight: FontWeight.bold)),
+                ),
+              ],
             ),
-            Text('Score: $score2', style: const TextStyle(fontSize: 23, fontWeight: FontWeight.bold)),
-          ],
-        ),
-        const SizedBox(height: 24),
-        Expanded(
-          child: Row(
+          ),
+          Row(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
+              RotatedBox(
+                quarterTurns: 2,
+                child: IconButton(
+                    onPressed: () {
+                      setState(() {
+                        initializeGame();
+                      });
+                    },
+                    icon: const Icon(Icons.restart_alt, size: 36)),
+              ),
+              const SizedBox(width: 16),
               AbsorbPointer(
-                  child: SizedBox(width: 120, child: singleBox(11, listBoard[11].isMandari, isLeft: true)),
+                  child: SizedBox(width: itemWidth/5, height: itemWidth/5 + itemWidth/5, child: singleBox(11, listBoard[11].isMandari, isLeft: true)),
                   absorbing: true),
-              Container(
+              SizedBox(
                 width: itemWidth,
-                color: Colors.blue,
                 child: Column(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
@@ -90,9 +145,9 @@ class _BackgroundState extends State<Background> {
                         shrinkWrap: true,
                         itemCount: 5,
                         gridDelegate:
-                            const SliverGridDelegateWithFixedCrossAxisCount(crossAxisCount: 5, childAspectRatio: .889),
+                            const SliverGridDelegateWithFixedCrossAxisCount(crossAxisCount: 5, childAspectRatio: 1),
                         itemBuilder: (BuildContext context, int index) {
-                          print('============= ${listBoard[index].color.toString()}');
+                          // print('============= ${listBoard[index].color.toString()}');
                           return singleBox(index, listBoard[index].isMandari);
                         },
                       ),
@@ -105,9 +160,9 @@ class _BackgroundState extends State<Background> {
                         itemCount: 5,
                         reverse: false,
                         gridDelegate:
-                            const SliverGridDelegateWithFixedCrossAxisCount(crossAxisCount: 5, childAspectRatio: .889),
+                            const SliverGridDelegateWithFixedCrossAxisCount(crossAxisCount: 5, childAspectRatio: 1),
                         itemBuilder: (BuildContext context, int index) {
-                          print('============= ${listBoard[index].color.toString()}');
+                          // print('============= ${listBoard[index].color.toString()}');
                           return singleBox(index + 6, listBoard[index + 6].isMandari);
                         },
                       ),
@@ -115,32 +170,62 @@ class _BackgroundState extends State<Background> {
                   ],
                 ),
               ),
-              AbsorbPointer(child: SizedBox(width: 120, child: singleBox(5, listBoard[5].isMandari)), absorbing: true),
+              AbsorbPointer(child: SizedBox(width: itemWidth/5, height: itemWidth/5 + itemWidth/5, child: singleBox(5, listBoard[5].isMandari)), absorbing: true),
+              const SizedBox(width: 16),
+              IconButton(
+                  onPressed: () {
+                    setState(() {
+                      initializeGame();
+                    });
+                  },
+                  icon: const Icon(Icons.restart_alt, size: 36)),
             ],
           ),
-        ),
-        const SizedBox(height: 24),
-        Row(
-          crossAxisAlignment: CrossAxisAlignment.center,
-          mainAxisAlignment: MainAxisAlignment.spaceAround,
-          children: [
-            Text('Player 1',
-                style: TextStyle(
+          AbsorbPointer(
+            absorbing: currentPlayer == PLAYER_2,
+            child: Row(
+              crossAxisAlignment: CrossAxisAlignment.center,
+              mainAxisAlignment: MainAxisAlignment.spaceAround,
+              children: [
+                Text('Player 1',
+                    style: TextStyle(
+                        fontSize: 23,
+                        fontWeight: FontWeight.bold,
+                        color: currentPlayer == PLAYER_1 ? Colors.lightBlue : Colors.black)),
+                Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  crossAxisAlignment: CrossAxisAlignment.center,
+                  children: [
+                    IconButton(onPressed: () {
+                      if (mIndex < 0) return;
+                      clickLeft(mIndex);
+                    }, iconSize: 48, icon: const Icon(Icons.arrow_left)),
+                    Text('DẢI SANG TRÁI')
+                  ],
+                ),
+                Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  crossAxisAlignment: CrossAxisAlignment.center,
+                  children: [
+                    IconButton(onPressed: () {
+                      if (mIndex < 0) return;
+                      clickRight(mIndex);
+                    }, iconSize: 48, icon: const Icon(Icons.arrow_right, size: 48)),
+
+                    Text('DẢI SANG PHẢI')
+                  ],
+                ),
+
+                Text('Score: $score1', style: TextStyle(
                     fontSize: 23,
-                    fontWeight: FontWeight.bold,
-                    color: currentPlayer == PLAYER_1 ? Colors.red : Colors.black)),
-            Text('Score: $score1', style: const TextStyle(fontSize: 23, fontWeight: FontWeight.bold)),
-            IconButton(
-                onPressed: () {
-                  setState(() {
-                    initializeGame();
-                  });
-                },
-                icon: const Icon(Icons.restart_alt))
-          ],
-        ),
-        const SizedBox(height: 24),
-      ],
+                    color: currentPlayer == PLAYER_1 ? Colors.lightBlue : Colors.black,
+                    fontWeight: FontWeight.bold)),
+              ],
+            ),
+          ),
+          const SizedBox(height: 16),
+        ],
+      ),
     );
   }
 
@@ -154,10 +239,15 @@ class _BackgroundState extends State<Background> {
     int score = 0;
     listBoard[index].score = 0;
 
-    Timer.periodic(const Duration(seconds: 1), (timer) {
+    Timer.periodic(const Duration(milliseconds: 750), (timer) {
       try {
         // listBoard[i].color = Colors.orange;
-        setState(() {});
+        setState(() {
+          var iYellow = i+1>11?0:i+1;
+          var iBlue = i>11?0:i;
+          listBoard[iYellow].color = Colors.yellow;
+          listBoard[iBlue].color = listBoard[iBlue].isMandari ? Colors.red : Colors.blue;
+        });
         print('${timer.tick}');
         if (boc > 0) {
           boc--;
@@ -167,10 +257,12 @@ class _BackgroundState extends State<Background> {
           if (boc == 0) {
             if (!listBoard[i + 1 == 12 ? 0 : i + 1].isMandari && listBoard[i + 1 == 12 ? 0 : i + 1].score != 0) {
               i++;
+              listBoard[i-1>11?0:i-1].color = listBoard[i-1>11?0:i-1].isMandari ? Colors.red : Colors.blue;
               if (i == 12) i = 0;
               boc = listBoard[i].score;
               listBoard[i].score = 0;
             } else {
+              listBoard[i].color = listBoard[i].isMandari ? Colors.red : Colors.blue;
               stop = true;
               print('stop 2');
             }
@@ -186,7 +278,7 @@ class _BackgroundState extends State<Background> {
               !listBoard[i + 1 == 12 ? 0 : i + 1].isMandari) {
             i = i + 1 == 12 ? 0 : i + 1;
             i = i + 1 == 12 ? 0 : i + 1;
-            if (listBoard[i].isMandari) score += 9;
+            if (listBoard[i].isMandari) score += 10;
             score += listBoard[i].score;
             listBoard[i].score = 0;
           }
@@ -195,6 +287,7 @@ class _BackgroundState extends State<Background> {
           } else {
             score2 = score;
           }
+          changeTurn();
         }
       } catch (e) {
         timer.cancel();
@@ -209,9 +302,14 @@ class _BackgroundState extends State<Background> {
     int score = 0;
     listBoard[index].score = 0;
 
-    Timer.periodic(const Duration(seconds: 1), (timer) {
+    Timer.periodic(const Duration(milliseconds: 750), (timer) {
       try {
-        setState(() {});
+        setState(() {
+          var iYellow = i-1<0?11:i-1;
+          var iBlue = i<0?11:i;
+          listBoard[iYellow].color = Colors.yellow;
+          listBoard[iBlue].color = listBoard[iBlue].isMandari ? Colors.red : Colors.blue;
+        });
         if (boc > 0) {
           boc--;
           i--;
@@ -220,10 +318,12 @@ class _BackgroundState extends State<Background> {
           if (boc == 0) {
             if (!listBoard[i - 1 == -1 ? 11 : i - 1].isMandari && listBoard[i - 1 == -1 ? 11 : i - 1].score != 0) {
               i--;
+              listBoard[i+1<0?11:i+1].color = listBoard[i+1<0?11:i+1].isMandari ? Colors.red : Colors.blue;
               if (i == -1) i = 11;
               boc = listBoard[i].score;
               listBoard[i].score = 0;
             } else {
+              listBoard[i].color = listBoard[i].isMandari ? Colors.red : Colors.blue;
               stop = true;
             }
           }
@@ -235,7 +335,7 @@ class _BackgroundState extends State<Background> {
               !listBoard[i - 1 == -1 ? 11 : i - 1].isMandari) {
             i = i - 1 == -1 ? 11 : i - 1;
             i = i - 1 == -1 ? 11 : i - 1;
-            if (listBoard[i].isMandari) score += 9;
+            if (listBoard[i].isMandari) score += 10;
             score += listBoard[i].score;
             listBoard[i].score = 0;
           }
@@ -245,6 +345,7 @@ class _BackgroundState extends State<Background> {
           } else {
             score2 = score;
           }
+          changeTurn();
         }
       } catch (e) {
         timer.cancel();
@@ -253,6 +354,9 @@ class _BackgroundState extends State<Background> {
   }
 
   void changeTurn() {
+    for (int i = 0; i< listBoard.length; i++) {
+      listBoard[i].selected = false;
+    }
     if (currentPlayer == PLAYER_1) {
       currentPlayer = PLAYER_2;
     } else {
@@ -300,7 +404,14 @@ class _BackgroundState extends State<Background> {
     return InkWell(
       onTap: () {
         if (endGame || listBoard[index].score == 0) return;
-        showDialog(
+        setState(() {
+          mIndex = index;
+          for (int i = 0; i< listBoard.length; i++) {
+            listBoard[i].selected = false;
+          }
+          listBoard[mIndex].selected = true;
+        });
+        /*showDialog(
             context: context,
             builder: (context) => AlertDialog(
                   title: const Text('Chose your direct?'),
@@ -314,6 +425,7 @@ class _BackgroundState extends State<Background> {
                           directLeft_cf(index);
                           checkForWin();
                         });
+                        Navigator.of(context).pop();
                       },
                     ),
                     FlatButton(
@@ -329,87 +441,60 @@ class _BackgroundState extends State<Background> {
                       },
                     ),
                   ],
-                ));
+                ));*/
       },
       child: Container(
         decoration: BoxDecoration(
-            color: listBoard[index].color,
+            color: listBoard[index].score == 0
+                ? Colors.grey
+                : listBoard[index].selected ? Colors.lightBlue : listBoard[index].color,
             borderRadius: isMandari ? radius : BorderRadius.zero,
             border: Border.all(width: .5, color: Colors.black)),
         child: Align(
             alignment: Alignment.center,
-            child: Text(
-              '${listBoard[index].score}',
-              style: TextStyle(
-                fontWeight: FontWeight.bold,
-                fontSize: isMandari ? 38 : 32,
-              ),
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                RotatedBox(
+                  quarterTurns: 2,
+                  child: Text(
+                    '${listBoard[index].score}',
+                    style: TextStyle(
+                      fontWeight: FontWeight.bold,
+                      fontSize: currentPlayer == PLAYER_2 ? 38 : 0
+                    ),
+                    textAlign: TextAlign.center,
+                  ),
+                ),
+                Text(
+                  '${listBoard[index].score}',
+                  style: TextStyle(
+                    fontWeight: FontWeight.bold,
+                    fontSize: currentPlayer == PLAYER_1 ? 38 : 0,
+                  ),
+                  textAlign: TextAlign.center,
+                ),
+              ],
             )),
       ),
     );
-    /*} else {
-      return InkWell(
-        onTap: listBoard[index].score == 0 || (index < 11 && index > 5)
-            ? null
-            : () {
-                if (endGame) return;
-                showDialog(
-                    context: context,
-                    builder: (context) => AlertDialog(
-                          title: const Text('Chose your direct?'),
-                          actions: <Widget>[
-                            FlatButton(
-                              child: const Text('Left'),
-                              onPressed: () {
-                                setState(() {
-                                  changeTurn();
-                                  checkScattered();
-                                  directRight_cf(index);
-
-                                  checkForWin();
-                                });
-                                Navigator.of(context).pop();
-                              },
-                            ),
-                            FlatButton(
-                              child: const Text('Right'),
-                              onPressed: () {
-                                if (endGame) return;
-                                setState(() {
-                                  changeTurn();
-                                  checkScattered();
-
-                                  directLeft_cf(index);
-                                  checkForWin();
-                                });
-                                Navigator.of(context).pop();
-                              },
-                            ),
-                          ],
-                        ));
-              },
-        child: Container(
-          decoration: BoxDecoration(
-              color:
-                  listBoard[index].score == 0 ? Colors.grey : (listBoard[index].isMandari ? Colors.red : Colors.blue),
-              borderRadius: BorderRadius.circular(15),
-              border: Border.all(width: 5, color: Colors.black)),
-          child: Align(
-              alignment: Alignment.center,
-              child: Text(
-                // '$index',
-                '${listBoard[index].score}',
-                style: const TextStyle(
-                  fontWeight: FontWeight.bold,
-                  fontSize: 23,
-                ),
-              )),
-        ),
-      );
-    }*/
   }
 
-  void checkTurn() {}
+  void clickLeft(int index) {
+    setState(() {
+      checkScattered();
+      directLeft_cf(index);
+      checkForWin();
+    });
+  }
+
+  void clickRight(int index) {
+    setState(() {
+      checkScattered();
+      directRight_cf(index);
+      checkForWin();
+    });
+  }
 
   void checkScattered() {
     int temp1 = 0;
