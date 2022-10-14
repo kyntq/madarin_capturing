@@ -11,24 +11,14 @@ class WebViewScreen extends StatefulWidget {
 }
 
 class _WebViewScreenState extends State<WebViewScreen> {
+
   @override
   void initState() {
-    // TODO: implement initState
     SystemChrome.setPreferredOrientations([
-      DeviceOrientation.portraitDown,
       DeviceOrientation.portraitUp,
     ]);
     super.initState();
   }
-  // @override
-  // void dispose() {
-  //   // TODO: implement dispose
-  //   SystemChrome.setPreferredOrientations([
-  //     DeviceOrientation.landscapeRight,
-  //     DeviceOrientation.landscapeLeft,
-  //   ]);
-  //   super.dispose();
-  // }
 
   @override
   Widget build(BuildContext context) {
