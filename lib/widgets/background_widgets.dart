@@ -87,7 +87,9 @@ class _BackgroundState extends State<Background> {
                         style: TextStyle(
                             fontSize: 23,
                             fontWeight: FontWeight.bold,
-                            color: currentPlayer == PLAYER_2 ? Colors.lightBlue : Colors.black),
+                            color: currentPlayer == PLAYER_2
+                                ? Colors.lightBlue
+                                : Colors.black),
                       ),
                     ),
                     RotatedBox(
@@ -129,7 +131,9 @@ class _BackgroundState extends State<Background> {
                       child: Text('Score: $score2',
                           style: TextStyle(
                               fontSize: 23,
-                              color: currentPlayer == PLAYER_2 ? Colors.lightBlue : Colors.black,
+                              color: currentPlayer == PLAYER_2
+                                  ? Colors.lightBlue
+                                  : Colors.black,
                               fontWeight: FontWeight.bold)),
                     ),
                   ],
@@ -153,7 +157,8 @@ class _BackgroundState extends State<Background> {
                       child: SizedBox(
                           width: itemWidth / 5,
                           height: itemWidth / 5 + itemWidth / 5,
-                          child: singleBox(11, listBoard[11].isMandari, isLeft: true)),
+                          child: singleBox(11, listBoard[11].isMandari,
+                              isLeft: true)),
                       absorbing: true),
                   SizedBox(
                     width: itemWidth,
@@ -167,9 +172,11 @@ class _BackgroundState extends State<Background> {
                             shrinkWrap: true,
                             itemCount: 5,
                             gridDelegate:
-                                const SliverGridDelegateWithFixedCrossAxisCount(crossAxisCount: 5, childAspectRatio: 1),
+                                const SliverGridDelegateWithFixedCrossAxisCount(
+                                    crossAxisCount: 5, childAspectRatio: 1),
                             itemBuilder: (BuildContext context, int index) {
-                              return singleBox(index, listBoard[index].isMandari);
+                              return singleBox(
+                                  index, listBoard[index].isMandari);
                             },
                           ),
                         ),
@@ -181,9 +188,11 @@ class _BackgroundState extends State<Background> {
                             itemCount: 5,
                             reverse: false,
                             gridDelegate:
-                                const SliverGridDelegateWithFixedCrossAxisCount(crossAxisCount: 5, childAspectRatio: 1),
+                                const SliverGridDelegateWithFixedCrossAxisCount(
+                                    crossAxisCount: 5, childAspectRatio: 1),
                             itemBuilder: (BuildContext context, int index) {
-                              return singleBox(index + 6, listBoard[index + 6].isMandari);
+                              return singleBox(
+                                  index + 6, listBoard[index + 6].isMandari);
                             },
                           ),
                         ),
@@ -216,7 +225,9 @@ class _BackgroundState extends State<Background> {
                         style: TextStyle(
                             fontSize: 23,
                             fontWeight: FontWeight.bold,
-                            color: currentPlayer == PLAYER_1 ? Colors.lightBlue : Colors.black)),
+                            color: currentPlayer == PLAYER_1
+                                ? Colors.lightBlue
+                                : Colors.black)),
                     Column(
                       mainAxisAlignment: MainAxisAlignment.center,
                       crossAxisAlignment: CrossAxisAlignment.center,
@@ -248,7 +259,9 @@ class _BackgroundState extends State<Background> {
                     Text('Score: $score1',
                         style: TextStyle(
                             fontSize: 23,
-                            color: currentPlayer == PLAYER_1 ? Colors.lightBlue : Colors.black,
+                            color: currentPlayer == PLAYER_1
+                                ? Colors.lightBlue
+                                : Colors.black,
                             fontWeight: FontWeight.bold)),
                   ],
                 ),
@@ -278,7 +291,8 @@ class _BackgroundState extends State<Background> {
           var iYellow = i + 1 > 11 ? 0 : i + 1;
           var iBlue = i > 11 ? 0 : i;
           listBoard[iYellow].color = Colors.yellow;
-          listBoard[iBlue].color = listBoard[iBlue].isMandari ? Colors.red : Colors.blue;
+          listBoard[iBlue].color =
+              listBoard[iBlue].isMandari ? Colors.red : Colors.blue;
         });
         print('${timer.tick}');
         if (boc > 0) {
@@ -287,15 +301,19 @@ class _BackgroundState extends State<Background> {
           if (i == 12) i = 0;
           listBoard[i].score++;
           if (boc == 0) {
-            if (!listBoard[i + 1 == 12 ? 0 : i + 1].isMandari && listBoard[i + 1 == 12 ? 0 : i + 1].score != 0) {
+            if (!listBoard[i + 1 == 12 ? 0 : i + 1].isMandari &&
+                listBoard[i + 1 == 12 ? 0 : i + 1].score != 0) {
               i++;
               listBoard[i - 1 > 11 ? 0 : i - 1].color =
-                  listBoard[i - 1 > 11 ? 0 : i - 1].isMandari ? Colors.red : Colors.blue;
+                  listBoard[i - 1 > 11 ? 0 : i - 1].isMandari
+                      ? Colors.red
+                      : Colors.blue;
               if (i == 12) i = 0;
               boc = listBoard[i].score;
               listBoard[i].score = 0;
             } else {
-              listBoard[i].color = listBoard[i].isMandari ? Colors.red : Colors.blue;
+              listBoard[i].color =
+                  listBoard[i].isMandari ? Colors.red : Colors.blue;
               stop = true;
             }
           }
@@ -313,9 +331,9 @@ class _BackgroundState extends State<Background> {
             listBoard[i].score = 0;
           }
           if (currentPlayer == PLAYER_1) {
-            score1 = score;
+            score1 += score;
           } else {
-            score2 = score;
+            score2 += score;
           }
           changeTurn();
         }
@@ -338,7 +356,8 @@ class _BackgroundState extends State<Background> {
           var iYellow = i - 1 < 0 ? 11 : i - 1;
           var iBlue = i < 0 ? 11 : i;
           listBoard[iYellow].color = Colors.yellow;
-          listBoard[iBlue].color = listBoard[iBlue].isMandari ? Colors.red : Colors.blue;
+          listBoard[iBlue].color =
+              listBoard[iBlue].isMandari ? Colors.red : Colors.blue;
         });
         if (boc > 0) {
           boc--;
@@ -346,15 +365,20 @@ class _BackgroundState extends State<Background> {
           if (i == -1) i = 11;
           listBoard[i].score++;
           if (boc == 0) {
-            if (!listBoard[i - 1 == -1 ? 11 : i - 1].isMandari && listBoard[i - 1 == -1 ? 11 : i - 1].score != 0) {
+            // ô tiếp theo k phải quan và ô tiếp theo có điểm số ! = 0
+            if (!listBoard[i - 1 == -1 ? 11 : i - 1].isMandari &&
+                listBoard[i - 1 == -1 ? 11 : i - 1].score != 0) {
               i--;
-              listBoard[i + 1 < 0 ? 11 : i + 1].color =
-                  listBoard[i + 1 < 0 ? 11 : i + 1].isMandari ? Colors.red : Colors.blue;
+              listBoard[i - 1 < 0 ? 11 : i - 1].color =
+                  listBoard[i - 1 < 0 ? 11 : i - 1].isMandari
+                      ? Colors.red
+                      : Colors.blue;
               if (i == -1) i = 11;
               boc = listBoard[i].score;
               listBoard[i].score = 0;
             } else {
-              listBoard[i].color = listBoard[i].isMandari ? Colors.red : Colors.blue;
+              listBoard[i].color =
+                  listBoard[i].isMandari ? Colors.red : Colors.blue;
               stop = true;
             }
           }
@@ -372,9 +396,9 @@ class _BackgroundState extends State<Background> {
           }
 
           if (currentPlayer == PLAYER_1) {
-            score1 = score;
+            score1 += score;
           } else {
-            score2 = score;
+            score2 += score;
           }
           changeTurn();
         }
@@ -430,8 +454,10 @@ class _BackgroundState extends State<Background> {
     }
     // if (currentPlayer == PLAYER_1) {
     var radius = isLeft == true
-        ? const BorderRadius.only(bottomLeft: Radius.circular(36), topLeft: Radius.circular(36))
-        : const BorderRadius.only(bottomRight: Radius.circular(36), topRight: Radius.circular(36));
+        ? const BorderRadius.only(
+            bottomLeft: Radius.circular(36), topLeft: Radius.circular(36))
+        : const BorderRadius.only(
+            bottomRight: Radius.circular(36), topRight: Radius.circular(36));
     return InkWell(
       onTap: () {
         if (endGame || listBoard[index].score == 0) return;
@@ -492,7 +518,9 @@ class _BackgroundState extends State<Background> {
                   quarterTurns: 2,
                   child: Text(
                     '${listBoard[index].score}',
-                    style: TextStyle(fontWeight: FontWeight.bold, fontSize: currentPlayer == PLAYER_2 ? 38 : 0),
+                    style: TextStyle(
+                        fontWeight: FontWeight.bold,
+                        fontSize: currentPlayer == PLAYER_2 ? 38 : 0),
                     textAlign: TextAlign.center,
                   ),
                 ),
@@ -548,26 +576,30 @@ class _BackgroundState extends State<Background> {
 
   void scattered(String team) {
     if (team.compareTo('1') == 0) {
-      //rai cho team 1
-      score1 -= 5;
-      if (score1 < 0) {
-        endGame = true;
-        return;
-      }
-      for (int i = 0; i < 5; i++) {
-        listBoard[i].score++;
-      }
+      setState(() {
+        //rai cho team 1
+        score1 -= 5;
+        if (score1 < 0) {
+          endGame = true;
+          return;
+        }
+        for (int i = 0; i < 5; i++) {
+          listBoard[i].score++;
+        }
+      });
     }
     if (team.compareTo('2') == 0) {
-      //rai cho team 2
-      score2 -= 5;
-      if (score1 < 0) {
-        endGame = true;
-        return;
-      }
-      for (int i = 6; i < 11; i++) {
-        listBoard[i].score++;
-      }
+      setState(() {
+        //rai cho team 2
+        score2 -= 5;
+        if (score1 < 0) {
+          endGame = true;
+          return;
+        }
+        for (int i = 6; i < 11; i++) {
+          listBoard[i].score++;
+        }
+      });
     }
   }
 }
