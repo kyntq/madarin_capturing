@@ -298,17 +298,20 @@ class _BackgroundState extends State<Background> {
         if (boc > 0) {
           boc--;
           i++;
-          if (i == 12) i = 0;
+          if (i > 11) i = 0;
           listBoard[i].score++;
           if (boc == 0) {
+            // o tiep theo k phai quan va khac 0
             if (!listBoard[i + 1 == 12 ? 0 : i + 1].isMandari &&
                 listBoard[i + 1 == 12 ? 0 : i + 1].score != 0) {
+              //boc o tiep theo de rai
               i++;
-              listBoard[i - 1 > 11 ? 0 : i - 1].color =
-                  listBoard[i - 1 > 11 ? 0 : i - 1].isMandari
+              if (i == 12) i = 0;
+              listBoard[i + 1 > 11 ? 0 : i + 1].color =
+                  listBoard[i + 1 > 11 ? 0 : i + 1].isMandari
                       ? Colors.red
                       : Colors.blue;
-              if (i == 12) i = 0;
+
               boc = listBoard[i].score;
               listBoard[i].score = 0;
             } else {
@@ -369,11 +372,12 @@ class _BackgroundState extends State<Background> {
             if (!listBoard[i - 1 == -1 ? 11 : i - 1].isMandari &&
                 listBoard[i - 1 == -1 ? 11 : i - 1].score != 0) {
               i--;
+              if (i == -1) i = 11;
               listBoard[i - 1 < 0 ? 11 : i - 1].color =
                   listBoard[i - 1 < 0 ? 11 : i - 1].isMandari
                       ? Colors.red
                       : Colors.blue;
-              if (i == -1) i = 11;
+
               boc = listBoard[i].score;
               listBoard[i].score = 0;
             } else {
@@ -385,7 +389,9 @@ class _BackgroundState extends State<Background> {
         }
         if (stop) {
           timer.cancel();
+          //ô tiếp theo = 0 và k phải quan và ô tiếp theo nữa khác 0
           if (listBoard[i - 1 == -1 ? 11 : i - 1].score == 0 &&
+              listBoard[i - 2 == -2 ? 10 : i - 2].score != 0 &&
               listBoard[i - 2 == -1 ? 11 : i - 2].score != 0 &&
               !listBoard[i - 1 == -1 ? 11 : i - 1].isMandari) {
             i = i - 1 == -1 ? 11 : i - 1;

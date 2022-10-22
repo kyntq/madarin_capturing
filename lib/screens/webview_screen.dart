@@ -4,14 +4,14 @@ import 'package:webview_flutter/webview_flutter.dart';
 
 class WebViewScreen extends StatefulWidget {
   final String url;
-   WebViewScreen({Key? key, required this.url}) : super(key: key);
+
+  WebViewScreen({Key? key, required this.url}) : super(key: key);
 
   @override
   State<WebViewScreen> createState() => _WebViewScreenState();
 }
 
 class _WebViewScreenState extends State<WebViewScreen> {
-
   @override
   void initState() {
     SystemChrome.setPreferredOrientations([
