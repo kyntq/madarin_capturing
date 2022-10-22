@@ -27,18 +27,18 @@ class _BackgroundState extends State<Background> {
     score2 = 0;
 
     listBoard = [
+      Box(5, false, Colors.blue, false), //0
+      Box(5, false, Colors.blue, false), //1
       Box(5, false, Colors.blue, false), //2
       Box(5, false, Colors.blue, false), //3
       Box(5, false, Colors.blue, false), //4
-      Box(5, false, Colors.blue, false), //5
-      Box(5, false, Colors.blue, false),
-      Box(10, true, Colors.red, false),
+      Box(10, true, Colors.red, false), //5
+      Box(5, false, Colors.blue, false), //6
       Box(5, false, Colors.blue, false), //7
+      Box(5, false, Colors.blue, false), //8
       Box(5, false, Colors.blue, false), //9
       Box(5, false, Colors.blue, false), //10
-      Box(5, false, Colors.blue, false), //11
-      Box(5, false, Colors.blue, false),
-      Box(10, true, Colors.red, false),
+      Box(10, true, Colors.red, false), //11
     ];
   }
 
@@ -67,7 +67,7 @@ class _BackgroundState extends State<Background> {
   Widget build(BuildContext context) {
     final Size deviceSize = MediaQuery.of(context).size;
     final double itemWidth = deviceSize.width / 2.1;
-    print('itemWidth= $itemWidth');
+
     return Scaffold(
       body: SafeArea(
         child: SingleChildScrollView(
@@ -274,144 +274,144 @@ class _BackgroundState extends State<Background> {
     );
   }
 
-  var stop = false;
-
   // Game process
-  void directLeft_cf(int index) {
-    stop = false;
+  Future<void> directLeft_cf(int index) async {
     int boc = listBoard[index].score;
     int i = index;
     int score = 0;
     listBoard[index].score = 0;
 
-    Timer.periodic(const Duration(milliseconds: 750), (timer) {
-      try {
-        // listBoard[i].color = Colors.orange;
-        setState(() {
-          var iYellow = i + 1 > 11 ? 0 : i + 1;
-          var iBlue = i > 11 ? 0 : i;
-          listBoard[iYellow].color = Colors.yellow;
-          listBoard[iBlue].color =
-              listBoard[iBlue].isMandari ? Colors.red : Colors.blue;
-        });
-        print('${timer.tick}');
-        if (boc > 0) {
-          boc--;
-          i++;
-          if (i > 11) i = 0;
-          listBoard[i].score++;
-          if (boc == 0) {
-            // o tiep theo k phai quan va khac 0
-            if (!listBoard[i + 1 == 12 ? 0 : i + 1].isMandari &&
-                listBoard[i + 1 == 12 ? 0 : i + 1].score != 0) {
-              //boc o tiep theo de rai
-              i++;
-              if (i == 12) i = 0;
-              listBoard[i + 1 > 11 ? 0 : i + 1].color =
-                  listBoard[i + 1 > 11 ? 0 : i + 1].isMandari
-                      ? Colors.red
-                      : Colors.blue;
+    try {
+      while (boc > 0) {
+        await Future.delayed(
+          const Duration(seconds: 0),
+          () {
+            setState(() {
+              var iYellow = i + 1 == 12 ? 0 : i + 1;
+              var iBlue = i == 12 ? 0 : i;
+              listBoard[iYellow].color = Colors.yellow;
+              print('current i: $iYellow'  );
+              print('yellow i: $iYellow'  );
+              listBoard[iBlue].color =
+                  listBoard[iBlue].isMandari ? Colors.red : Colors.blue;
+            });
+          },
+        );
+        boc--;
+        i++;
+        if (i == 12) i = 0;
+        listBoard[i].score++;
 
-              boc = listBoard[i].score;
-              listBoard[i].score = 0;
-            } else {
-              listBoard[i].color =
-                  listBoard[i].isMandari ? Colors.red : Colors.blue;
-              stop = true;
-            }
-          }
-        }
+        if (boc == 0) {
+          // o tiep theo k phai quan va khac 0
+          if (!listBoard[i + 1 == 12 ? 0 : i + 1].isMandari &&
+              listBoard[i + 1 == 12 ? 0 : i + 1].score != 0) {
+            //boc o tiep theo de rai
+            i++;
+            if (i == 12) i = 0;
+            // set color sửa  i + 1 > 11 ? 0 : i + 1 thành i - 1 < 0 ? 11 : i - 1
+            listBoard[i - 1 < 0 ? 11 : i - 1].color =
+                listBoard[i - 1 < 0 ? 11 : i - 1].isMandari
+                    ? Colors.red
+                    : Colors.blue;
 
-        if (stop) {
-          timer.cancel();
-          while (listBoard[i + 1 == 12 ? 0 : i + 1].score == 0 &&
-              listBoard[i + 2 == 12 ? 0 : i + 2].score != 0 &&
-              !listBoard[i + 1 == 12 ? 0 : i + 1].isMandari) {
-            i = i + 1 == 12 ? 0 : i + 1;
-            i = i + 1 == 12 ? 0 : i + 1;
-            if (listBoard[i].isMandari) score += 10;
-            score += listBoard[i].score;
+            boc = listBoard[i].score;
             listBoard[i].score = 0;
-          }
-          if (currentPlayer == PLAYER_1) {
-            score1 += score;
           } else {
-            score2 += score;
+            listBoard[i].color =
+                listBoard[i].isMandari ? Colors.red : Colors.blue;
           }
-          changeTurn();
         }
-      } catch (e) {
-        timer.cancel();
       }
-    });
+
+      //Ăn cờ
+      while (listBoard[i + 1 == 12 ? 0 : i + 1].score == 0 &&
+          !listBoard[i + 1 == 12 ? 0 : i + 1].isMandari &&
+          listBoard[i + 2 == 12 ? 0 : i + 2].score != 0) {
+        print('i trc khi ăn : $i');
+        i = i + 1 == 12 ? 0 : i + 1;
+        i = i + 1 == 12 ? 0 : i + 1;
+        print('i sau khi ăn : $i');
+        if (listBoard[i].isMandari) score += 10;
+        score += listBoard[i].score;
+        listBoard[i].score = 0;
+      }
+
+      if (currentPlayer == PLAYER_1) {
+        score1 += score;
+      } else {
+        score2 += score;
+      }
+      changeTurn();
+    } catch (e) {}
   }
 
-  void directRight_cf(int index) {
-    stop = false;
+  Future<void> directRight_cf(int index) async {
     int boc = listBoard[index].score;
     int i = index;
     int score = 0;
     listBoard[index].score = 0;
 
-    Timer.periodic(const Duration(milliseconds: 750), (timer) {
-      try {
-        setState(() {
-          var iYellow = i - 1 < 0 ? 11 : i - 1;
-          var iBlue = i < 0 ? 11 : i;
-          listBoard[iYellow].color = Colors.yellow;
-          listBoard[iBlue].color =
-              listBoard[iBlue].isMandari ? Colors.red : Colors.blue;
-        });
-        if (boc > 0) {
-          boc--;
-          i--;
-          if (i == -1) i = 11;
-          listBoard[i].score++;
-          if (boc == 0) {
-            // ô tiếp theo k phải quan và ô tiếp theo có điểm số ! = 0
-            if (!listBoard[i - 1 == -1 ? 11 : i - 1].isMandari &&
-                listBoard[i - 1 == -1 ? 11 : i - 1].score != 0) {
-              i--;
-              if (i == -1) i = 11;
-              listBoard[i - 1 < 0 ? 11 : i - 1].color =
-                  listBoard[i - 1 < 0 ? 11 : i - 1].isMandari
-                      ? Colors.red
-                      : Colors.blue;
+    try {
+      while (boc > 0) {
+        await Future.delayed(
+          const Duration(seconds: 0),
+          () {
+            setState(() {
+              var iYellow = i - 1 < 0 ? 11 : i - 1;
+              var iBlue = i < 0 ? 11 : i;
+              listBoard[iYellow].color = Colors.yellow;
+              listBoard[iBlue].color =
+                  listBoard[iBlue].isMandari ? Colors.red : Colors.blue;
+            });
+          },
+        );
+        boc--;
+        i--;
+        if (i == -1) i = 11;
+        listBoard[i].score++;
 
-              boc = listBoard[i].score;
-              listBoard[i].score = 0;
-            } else {
-              listBoard[i].color =
-                  listBoard[i].isMandari ? Colors.red : Colors.blue;
-              stop = true;
-            }
-          }
-        }
-        if (stop) {
-          timer.cancel();
-          //ô tiếp theo = 0 và k phải quan và ô tiếp theo nữa khác 0
-          if (listBoard[i - 1 == -1 ? 11 : i - 1].score == 0 &&
-              listBoard[i - 2 == -2 ? 10 : i - 2].score != 0 &&
-              listBoard[i - 2 == -1 ? 11 : i - 2].score != 0 &&
-              !listBoard[i - 1 == -1 ? 11 : i - 1].isMandari) {
-            i = i - 1 == -1 ? 11 : i - 1;
-            i = i - 1 == -1 ? 11 : i - 1;
-            if (listBoard[i].isMandari) score += 10;
-            score += listBoard[i].score;
+        if (boc == 0) {
+          // ô tiếp theo k phải quan và ô tiếp theo có điểm số ! = 0 thì bốc tiếp
+          if (!listBoard[i - 1 == -1 ? 11 : i - 1].isMandari &&
+              listBoard[i - 1 == -1 ? 11 : i - 1].score != 0) {
+            i--;
+            if (i == -1) i = 11;
+            // sửa i - 1 < 0 ? 11 : i - 1 thành i + 1 > 11 ? 0 : i+1 set color
+            listBoard[i + 1 > 11 ? 0 : i + 1].color =
+                listBoard[i + 1 > 11 ? 0 : i + 1].isMandari
+                    ? Colors.red
+                    : Colors.blue;
+
+            boc = listBoard[i].score;
             listBoard[i].score = 0;
-          }
-
-          if (currentPlayer == PLAYER_1) {
-            score1 += score;
           } else {
-            score2 += score;
+            listBoard[i].color =
+                listBoard[i].isMandari ? Colors.red : Colors.blue;
+            // IMPORTANT
           }
-          changeTurn();
         }
-      } catch (e) {
-        timer.cancel();
       }
-    });
+
+      // Check ăn cờ
+      //ô tiếp theo = 0 và k phải quan và ô tiếp theo nữa khác 0
+      while (listBoard[i - 1 == -1 ? 11 : i - 1].score == 0 &&
+          !listBoard[i - 1 == -1 ? 11 : i - 1].isMandari &&
+          listBoard[i - 2 == -1 ? 11 : i - 2].score != 0) {
+        i = i - 1 == -1 ? 11 : i - 1;
+        i = i - 1 == -1 ? 11 : i - 1;
+        if (listBoard[i].isMandari) score += 10;
+        score += listBoard[i].score;
+        listBoard[i].score = 0;
+      }
+
+      if (currentPlayer == PLAYER_1) {
+        score1 += score;
+      } else {
+        score2 += score;
+      }
+      changeTurn();
+    } catch (e) {}
   }
 
   void changeTurn() {
@@ -425,18 +425,23 @@ class _BackgroundState extends State<Background> {
     }
   }
 
-  checkForWin() {
+  void end() {
+    setState(() {
+      endGame = true;
+    });
+  }
+
+  void checkForWin() {
     String msg = '';
     var temp = listBoard.firstWhere((element) => element.isMandari);
     var temp2 = listBoard.lastWhere((element) => element.isMandari);
     if (temp.score == 0 && temp2.score == 0) {
-      endGame = true;
+      end();
       if (score1 > score2) {
         msg = 'Người chơi 1 chiến thắng với số điểm $score1'
             '\nNgười chơi 2 thua cuộc với số điểm $score2';
       }
       showGameOverMessage(msg);
-      return;
     }
   }
 

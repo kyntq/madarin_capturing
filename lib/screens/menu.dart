@@ -1,6 +1,7 @@
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:o_an_quan/screens/setting_screen.dart';
 import 'package:o_an_quan/screens/webview_screen.dart';
 import 'package:o_an_quan/widgets/background_widgets.dart';
 
@@ -63,7 +64,12 @@ class _MenuState extends State<Menu> {
                         );
                       },
                       child: const Text('Hướng dẫn')),
-                  TextButton(onPressed: () {}, child: const Text('Giới thiệu')),
+                  TextButton(onPressed: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(builder: (context) => SettingsMenu()),
+                    );
+                  }, child: const Text('Cài đặt')),
                 ],
               ),
             ),
