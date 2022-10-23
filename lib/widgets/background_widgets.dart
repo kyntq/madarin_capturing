@@ -438,6 +438,10 @@ class _BackgroundState extends State<Background> {
     String msg = '';
     var temp = listBoard.firstWhere((element) => element.isMandari);
     var temp2 = listBoard.lastWhere((element) => element.isMandari);
+    if (endGame == true) {
+      showGameOverMessage(msg);
+      return;
+    }
     if (temp.score == 0 && temp2.score == 0) {
       end();
       if (score1 > score2) {
