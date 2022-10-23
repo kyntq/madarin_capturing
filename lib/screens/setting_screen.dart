@@ -1,9 +1,7 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:get/get.dart';
 
 import '../widgets/setting_switch.dart';
-
 
 class SettingsMenu extends StatefulWidget {
   const SettingsMenu({Key? key}) : super(key: key);
@@ -14,20 +12,20 @@ class SettingsMenu extends StatefulWidget {
 
 class _SettingsMenuState extends State<SettingsMenu> {
   var settingSound = false;
-  late TextEditingController toc_do_dai;
+  TextEditingController toc_do_dai = TextEditingController();
+  TextEditingController point = TextEditingController();
+  var pointdp;
+  var speedp;
 
-  late TextEditingController point;
   @override
   Widget build(BuildContext context) {
-
     return Scaffold(
       appBar: AppBar(
-
         shape: const Border(
             bottom: BorderSide(
-              width: 1,
-              color: Colors.grey,
-            )),
+          width: 1,
+          color: Colors.grey,
+        )),
         elevation: 0,
         backgroundColor: Colors.white,
         title: const Text(
@@ -43,36 +41,35 @@ class _SettingsMenuState extends State<SettingsMenu> {
             child: Column(
               children: [
                 Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
+                    Text('Point of Mandarin'),
                     Container(
-
                         height: 53,
-                        child:
-
-                        TextField(
+                        child: TextField(
+                          controller: point,
                           onChanged: (val) {
                             setState(() {
-
+                              pointdp = val;
                             });
                           },
                           maxLines: 1,
-
                           keyboardType: TextInputType.number,
                           decoration: const InputDecoration(
                             filled: true,
                             fillColor: Colors.white,
                             border: InputBorder.none,
-                            hintText: 'Point of Mandarin',
+                            hintText: '(Default 10)',
                             hintTextDirection: TextDirection.ltr,
                           ),
                         )),
+                    Text('Speed'),
                     SizedBox(
-
                         height: 53,
                         child: TextField(
+                          controller: toc_do_dai,
                           maxLines: 1,
-
-                          keyboardType: TextInputType.text,
+                          keyboardType: TextInputType.number,
                           decoration: const InputDecoration(
                             filled: true,
                             fillColor: Colors.white,
@@ -80,10 +77,7 @@ class _SettingsMenuState extends State<SettingsMenu> {
                             hintText: 'Tốc độ dải',
                             hintTextDirection: TextDirection.ltr,
                           ),
-                        )
-
-                    ),
-
+                        )),
                     Container(
                       // decoration:
                       //     BoxDecoration(border: Border.all(color: Colors.grey)),
@@ -94,8 +88,12 @@ class _SettingsMenuState extends State<SettingsMenu> {
                         onChange: toggleSound,
                       ),
                     ),
-
-
+                    Center(
+                      child: ElevatedButton(
+                        onPressed: () {},
+                        child: Text('SAVED'),
+                      ),
+                    )
                   ],
                 ),
               ],
@@ -105,11 +103,10 @@ class _SettingsMenuState extends State<SettingsMenu> {
       ),
     );
   }
+
   void toggleSound(bool temp) {
     setState(() {
       settingSound = temp;
     });
   }
-
-
 }

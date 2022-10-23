@@ -1,3 +1,4 @@
+import 'package:audioplayers/audioplayers.dart';
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -65,6 +66,8 @@ class _MenuState extends State<Menu> {
                       },
                       child: const Text('Hướng dẫn')),
                   TextButton(onPressed: () {
+                    final audioPlayer = AudioCache();
+                    audioPlayer.play('brick-dropped-on-other-bricks-14722.wav');
                     Navigator.push(
                       context,
                       MaterialPageRoute(builder: (context) => SettingsMenu()),

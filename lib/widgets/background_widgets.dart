@@ -1,5 +1,6 @@
 import 'dart:async';
 
+import 'package:audioplayers/audioplayers.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
@@ -284,12 +285,14 @@ class _BackgroundState extends State<Background> {
     try {
       while (boc > 0) {
         await Future.delayed(
-          const Duration(seconds: 0),
+          const Duration(seconds: 1),
           () {
             setState(() {
               var iYellow = i + 1 == 12 ? 0 : i + 1;
               var iBlue = i == 12 ? 0 : i;
               listBoard[iYellow].color = Colors.yellow;
+              final audioPlayer = AudioCache();
+              audioPlayer.play('brick-dropped-on-other-bricks-14722.wav');
               print('current i: $iYellow'  );
               print('yellow i: $iYellow'  );
               listBoard[iBlue].color =
@@ -355,7 +358,7 @@ class _BackgroundState extends State<Background> {
     try {
       while (boc > 0) {
         await Future.delayed(
-          const Duration(seconds: 0),
+          const Duration(seconds: 1),
           () {
             setState(() {
               var iYellow = i - 1 < 0 ? 11 : i - 1;
