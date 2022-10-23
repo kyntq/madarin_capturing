@@ -293,8 +293,8 @@ class _BackgroundState extends State<Background> {
               listBoard[iYellow].color = Colors.yellow;
               final audioPlayer = AudioCache();
               audioPlayer.play('brick-dropped-on-other-bricks-14722.wav');
-              print('current i: $iYellow'  );
-              print('yellow i: $iYellow'  );
+              print('current i: $iYellow');
+              print('yellow i: $iYellow');
               listBoard[iBlue].color =
                   listBoard[iBlue].isMandari ? Colors.red : Colors.blue;
             });
@@ -580,39 +580,47 @@ class _BackgroundState extends State<Background> {
 
     if ((temp1 == 0) && (listBoard[0].score != 0 || listBoard[11].score != 0)) {
       // rai cho team 1
-      scattered('1');
+      scattered(1);
     }
     if ((temp1 == 0) && (listBoard[0].score != 0 || listBoard[11].score != 0)) {
       // rai cho team 2
-      scattered('2');
+      scattered(2);
     }
   }
 
-  void scattered(String team) {
-    if (team.compareTo('1') == 0) {
+  void scattered(int team) {
+    if (team == 1) {
       setState(() {
         //rai cho team 1
         score1 -= 5;
         if (score1 < 0) {
-          endGame = true;
+          setState(() {
+            endGame = true;
+          });
           return;
         }
-        for (int i = 0; i < 5; i++) {
-          listBoard[i].score++;
-        }
+        setState(() {
+          for (int i = 0; i < 5; i++) {
+            listBoard[i].score++;
+          }
+        });
       });
     }
-    if (team.compareTo('2') == 0) {
+    if (team == 2) {
       setState(() {
         //rai cho team 2
         score2 -= 5;
         if (score1 < 0) {
-          endGame = true;
+          setState(() {
+            endGame = true;
+          });
           return;
         }
-        for (int i = 6; i < 11; i++) {
-          listBoard[i].score++;
-        }
+        setState(() {
+          for (int i = 6; i < 11; i++) {
+            listBoard[i].score++;
+          }
+        });
       });
     }
   }
