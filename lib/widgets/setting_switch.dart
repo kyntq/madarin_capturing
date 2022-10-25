@@ -1,14 +1,14 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 
-class MeetingOption extends StatelessWidget {
+class SwitchOption extends StatelessWidget {
   final String text;
-  bool isMute;
+  bool isTurnOn;
   final Function(bool) onChange;
-  MeetingOption({
+  SwitchOption({
     Key? key,
     required this.text,
-    required this.isMute,
+    required this.isTurnOn,
     required this.onChange,
   }) : super(key: key);
 
@@ -27,7 +27,7 @@ class MeetingOption extends StatelessWidget {
               style: const TextStyle(fontSize: 16),
             ),
           ),
-          CupertinoSwitch(value: isMute, onChanged: onChange)
+          CupertinoSwitch(value: isTurnOn, onChanged: onChange)
           // Switch.adaptive(
           //   value: isMute,
           //   onChanged: onChange,
