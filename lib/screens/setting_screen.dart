@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 import '../widgets/setting_switch.dart';
 
@@ -11,13 +12,31 @@ class SettingsMenu extends StatefulWidget {
 
 class _SettingsMenuState extends State<SettingsMenu> {
   var settingSound = false;
-  TextEditingController toc_do_dai = TextEditingController();
+  TextEditingController speed = TextEditingController();
   TextEditingController point = TextEditingController();
-  var pointdp;
-  var speedp;
+  int? pointdp;
+  int? speedp;
+
+  _getConfig() async {
+    final prefs = await SharedPreferences.getInstance();
+
+    setState(() {
+      point.text = '${prefs.getInt('point')}';
+      speed.text = '${prefs.getInt('speed')}';
+      settingSound = prefs.getBool('sound')!;
+    });
+  }
+
+  @override
+  void initState() {
+    // TODO: implement initState
+    _getConfig();
+    super.initState();
+  }
 
   @override
   Widget build(BuildContext context) {
+
     return Scaffold(
       backgroundColor: const Color(0xff0D723D),
       appBar: AppBar(
@@ -31,23 +50,20 @@ class _SettingsMenuState extends State<SettingsMenu> {
       ),
       body: SafeArea(
         child: Padding(
-          padding: const EdgeInsets.only(top: 20.0, left: 16, right:  16),
+          padding: const EdgeInsets.only(top: 20.0, left: 16, right: 16),
           child: SingleChildScrollView(
             child: Column(
+
               children: [
                 Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    const Text('Số lượng điểm của Mandarin', style: TextStyle(color: Colors.white)),
+                    const Text('Số lượng điểm của quan',
+                        style: TextStyle(color: Colors.white)),
                     SizedBox(
                         height: 53,
                         child: TextField(
                           controller: point,
-                          onChanged: (val) {
-                            setState(() {
-                              pointdp = val;
-                            });
-                          },
                           maxLines: 1,
                           keyboardType: TextInputType.number,
                           decoration: const InputDecoration(
@@ -65,7 +81,7 @@ class _SettingsMenuState extends State<SettingsMenu> {
                     SizedBox(
                         height: 53,
                         child: TextField(
-                          controller: toc_do_dai,
+                          controller: speed,
                           maxLines: 1,
                           keyboardType: TextInputType.number,
                           decoration: const InputDecoration(
@@ -78,9 +94,9 @@ class _SettingsMenuState extends State<SettingsMenu> {
                         )),
                     SizedBox(
                       height: 56,
-                      child: MeetingOption(
+                      child: SwitchOption(
                         text: 'Âm thanh',
-                        isMute: settingSound,
+                        isTurnOn: settingSound,
                         onChange: toggleSound,
                       ),
                     ),
@@ -88,16 +104,28 @@ class _SettingsMenuState extends State<SettingsMenu> {
                       height: 16,
                     ),
                     TextButton(
-                      onPressed: () {
+                      onPressed: () async {
+                        try {
+                          final prefs = await SharedPreferences.getInstance();
 
+                          await prefs.setInt('point',  int.parse(point.text));
+                          await prefs.setInt('speed', int.parse(speed.text));
+                          await prefs.setBool('sound', settingSound);
+                          ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+                            content: Text("Đã lưu"),
+                          ));
+                        } catch (e) {}
                       },
                       child: Container(
                           width: double.infinity,
                           padding: const EdgeInsets.symmetric(vertical: 8),
-                          decoration: BoxDecoration(borderRadius: BorderRadius.circular(8), color: Colors.green.shade100),
+                          decoration: BoxDecoration(
+                              borderRadius: BorderRadius.circular(8),
+                              color: Colors.green.shade100),
                           child: const Text(
                             'Lưu',
-                            style: TextStyle(fontSize: 21, color: Color(0xff0D723D)),
+                            style: TextStyle(
+                                fontSize: 21, color: Color(0xff0D723D)),
                             textAlign: TextAlign.center,
                           )),
                     ),

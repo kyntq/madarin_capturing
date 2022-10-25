@@ -35,6 +35,9 @@ dependencies:
   dio: ^4.0.6
   webview_flutter: ^3.0.0
   audioplayers: ^0.20.1
+  assets_audio_player: ^3.0.5
+  audioplayer: ^0.8.1
+  shared_preferences: ^2.0.15
 
 
   # The following adds the Cupertino Icons font to your application.
@@ -67,6 +70,7 @@ flutter:
   assets:
   - assets/sounds/
   - assets/images/
+  - assets/audios/
 
 
 

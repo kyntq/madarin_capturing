@@ -1,12 +1,15 @@
 import 'dart:async';
 
-import 'package:audioplayers/audioplayers.dart';
+import 'package:assets_audio_player/assets_audio_player.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 import '../models/box.dart';
 
 class Background extends StatefulWidget {
+  const Background({Key? key}) : super(key: key);
+
   @override
   State<Background> createState() => _BackgroundState();
 }
@@ -17,30 +20,49 @@ class _BackgroundState extends State<Background> {
   int score1 = 0;
   int score2 = 0;
   late bool endGame;
-  late String currentPlayer;
+  String? currentPlayer;
   late List<Box> listBoard;
   var mIndex = -1;
+  int? speed;
+  int? pointOfMandarin;
+  bool turnSound = false;
+  bool _isLoading = true;
 
-  void initializeGame() {
+  void initializeGame() async {
     currentPlayer = PLAYER_1;
     endGame = false;
     score1 = 0;
     score2 = 0;
-
+    await _getPreference();
+    if (pointOfMandarin == null) pointOfMandarin = 10;
     listBoard = [
       Box(5, false, Colors.blue, false), //0
       Box(5, false, Colors.blue, false), //1
       Box(5, false, Colors.blue, false), //2
       Box(5, false, Colors.blue, false), //3
       Box(5, false, Colors.blue, false), //4
-      Box(10, true, Colors.red, false), //5
+      Box(pointOfMandarin!, true, Colors.red, false), //5
       Box(5, false, Colors.blue, false), //6
       Box(5, false, Colors.blue, false), //7
       Box(5, false, Colors.blue, false), //8
       Box(5, false, Colors.blue, false), //9
       Box(5, false, Colors.blue, false), //10
-      Box(10, true, Colors.red, false), //11
+      Box(pointOfMandarin!, true, Colors.red, false), //11
     ];
+  }
+
+  _getPreference() async {
+    final prefs = await SharedPreferences.getInstance();
+    final int? speedPre = prefs.getInt('speed');
+    final int? pointPre = prefs.getInt('point');
+    final bool? soundPre = prefs.getBool('sound');
+
+    setState(() {
+      speed = speedPre;
+      pointOfMandarin = pointPre;
+      turnSound = soundPre!;
+      _isLoading = false;
+    });
   }
 
   @override
@@ -50,6 +72,7 @@ class _BackgroundState extends State<Background> {
       DeviceOrientation.landscapeRight,
     ]);
     initializeGame();
+
     super.initState();
   }
 
@@ -71,206 +94,221 @@ class _BackgroundState extends State<Background> {
 
     return Scaffold(
       body: SafeArea(
-        child: SingleChildScrollView(
-          child: Column(
-            children: [
-              const SizedBox(height: 24),
-              AbsorbPointer(
-                absorbing: currentPlayer == PLAYER_1,
-                child: Row(
-                  crossAxisAlignment: CrossAxisAlignment.center,
-                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+        child: _isLoading
+            ? Center(
+                child: CircularProgressIndicator(),
+              )
+            : SingleChildScrollView(
+                child: Column(
                   children: [
-                    RotatedBox(
-                      quarterTurns: 2,
-                      child: Text(
-                        'Player 2',
-                        style: TextStyle(
-                            fontSize: 23,
-                            fontWeight: FontWeight.bold,
-                            color: currentPlayer == PLAYER_2
-                                ? Colors.lightBlue
-                                : Colors.black),
-                      ),
-                    ),
-                    RotatedBox(
-                      quarterTurns: 2,
-                      child: Column(
-                        mainAxisAlignment: MainAxisAlignment.center,
+                    const SizedBox(height: 24),
+                    AbsorbPointer(
+                      absorbing: currentPlayer == PLAYER_1,
+                      child: Row(
                         crossAxisAlignment: CrossAxisAlignment.center,
+                        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                         children: [
-                          IconButton(
-                              onPressed: () {
-                                if (mIndex < 0) return;
-                                clickRight(mIndex);
-                              },
-                              iconSize: 48,
-                              icon: const Icon(Icons.arrow_right, size: 48)),
-                          const Text('DẢI SANG PHẢI')
+                          RotatedBox(
+                            quarterTurns: 2,
+                            child: Text(
+                              'Player 2',
+                              style: TextStyle(
+                                  fontSize: 23,
+                                  fontWeight: FontWeight.bold,
+                                  color: currentPlayer == PLAYER_2
+                                      ? Colors.lightBlue
+                                      : Colors.black),
+                            ),
+                          ),
+                          RotatedBox(
+                            quarterTurns: 2,
+                            child: Column(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              crossAxisAlignment: CrossAxisAlignment.center,
+                              children: [
+                                IconButton(
+                                    onPressed: () {
+                                      if (mIndex < 0) return;
+                                      clickRight(mIndex);
+                                    },
+                                    iconSize: 48,
+                                    icon: const Icon(Icons.arrow_right,
+                                        size: 48)),
+                                const Text('DẢI SANG PHẢI')
+                              ],
+                            ),
+                          ),
+                          RotatedBox(
+                            quarterTurns: 2,
+                            child: Column(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              crossAxisAlignment: CrossAxisAlignment.center,
+                              children: [
+                                IconButton(
+                                    onPressed: () {
+                                      if (mIndex < 0) return;
+                                      clickLeft(mIndex);
+                                    },
+                                    iconSize: 48,
+                                    icon:
+                                        const Icon(Icons.arrow_left, size: 48)),
+                                const Text('DẢI SANG TRÁI')
+                              ],
+                            ),
+                          ),
+                          RotatedBox(
+                            quarterTurns: 2,
+                            child: Text('Score: $score2',
+                                style: TextStyle(
+                                    fontSize: 23,
+                                    color: currentPlayer == PLAYER_2
+                                        ? Colors.lightBlue
+                                        : Colors.black,
+                                    fontWeight: FontWeight.bold)),
+                          ),
                         ],
                       ),
                     ),
-                    RotatedBox(
-                      quarterTurns: 2,
-                      child: Column(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        crossAxisAlignment: CrossAxisAlignment.center,
-                        children: [
-                          IconButton(
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        RotatedBox(
+                          quarterTurns: 2,
+                          child: IconButton(
                               onPressed: () {
-                                if (mIndex < 0) return;
-                                clickLeft(mIndex);
+                                setState(() {
+                                  turnSound = !turnSound;
+                                });
                               },
-                              iconSize: 48,
-                              icon: const Icon(Icons.arrow_left, size: 48)),
-                          const Text('DẢI SANG TRÁI')
+                              icon: Icon(
+                                  turnSound
+                                      ? Icons.volume_down_alt
+                                      : Icons.volume_off,
+                                  size: 36)),
+                        ),
+                        const SizedBox(width: 16),
+                        AbsorbPointer(
+                            child: SizedBox(
+                                width: itemWidth / 5,
+                                height: itemWidth / 5 + itemWidth / 5,
+                                child: singleBox(11, listBoard[11].isMandari,
+                                    isLeft: true)),
+                            absorbing: true),
+                        SizedBox(
+                          width: itemWidth,
+                          child: Column(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              AbsorbPointer(
+                                absorbing: currentPlayer == PLAYER_1,
+                                child: GridView.builder(
+                                  physics: const NeverScrollableScrollPhysics(),
+                                  shrinkWrap: true,
+                                  itemCount: 5,
+                                  gridDelegate:
+                                      const SliverGridDelegateWithFixedCrossAxisCount(
+                                          crossAxisCount: 5,
+                                          childAspectRatio: 1),
+                                  itemBuilder:
+                                      (BuildContext context, int index) {
+                                    return singleBox(
+                                        index, listBoard[index].isMandari);
+                                  },
+                                ),
+                              ),
+                              AbsorbPointer(
+                                absorbing: currentPlayer == PLAYER_2,
+                                child: GridView.builder(
+                                  shrinkWrap: true,
+                                  physics: const NeverScrollableScrollPhysics(),
+                                  itemCount: 5,
+                                  reverse: false,
+                                  gridDelegate:
+                                      const SliverGridDelegateWithFixedCrossAxisCount(
+                                          crossAxisCount: 5,
+                                          childAspectRatio: 1),
+                                  itemBuilder:
+                                      (BuildContext context, int index) {
+                                    return singleBox(index + 6,
+                                        listBoard[index + 6].isMandari);
+                                  },
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                        AbsorbPointer(
+                            child: SizedBox(
+                                width: itemWidth / 5,
+                                height: itemWidth / 5 + itemWidth / 5,
+                                child: singleBox(5, listBoard[5].isMandari)),
+                            absorbing: true),
+                        const SizedBox(width: 16),
+                        IconButton(
+                            onPressed: () {
+                              setState(() {
+                                initializeGame();
+                              });
+                            },
+                            icon: const Icon(Icons.restart_alt, size: 36)),
+                      ],
+                    ),
+                    AbsorbPointer(
+                      absorbing: currentPlayer == PLAYER_2,
+                      child: Row(
+                        crossAxisAlignment: CrossAxisAlignment.center,
+                        mainAxisAlignment: MainAxisAlignment.spaceAround,
+                        children: [
+                          Text('Player 1',
+                              style: TextStyle(
+                                  fontSize: 23,
+                                  fontWeight: FontWeight.bold,
+                                  color: currentPlayer == PLAYER_1
+                                      ? Colors.lightBlue
+                                      : Colors.black)),
+                          Column(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            crossAxisAlignment: CrossAxisAlignment.center,
+                            children: [
+                              IconButton(
+                                  onPressed: () {
+                                    if (mIndex < 0) return;
+                                    clickLeft(mIndex);
+                                  },
+                                  iconSize: 48,
+                                  icon: const Icon(Icons.arrow_left)),
+                              const Text('DẢI SANG TRÁI')
+                            ],
+                          ),
+                          Column(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            crossAxisAlignment: CrossAxisAlignment.center,
+                            children: [
+                              IconButton(
+                                  onPressed: () {
+                                    if (mIndex < 0) return;
+                                    clickRight(mIndex);
+                                  },
+                                  iconSize: 48,
+                                  icon:
+                                      const Icon(Icons.arrow_right, size: 48)),
+                              const Text('DẢI SANG PHẢI')
+                            ],
+                          ),
+                          Text('Score: $score1',
+                              style: TextStyle(
+                                  fontSize: 23,
+                                  color: currentPlayer == PLAYER_1
+                                      ? Colors.lightBlue
+                                      : Colors.black,
+                                  fontWeight: FontWeight.bold)),
                         ],
                       ),
                     ),
-                    RotatedBox(
-                      quarterTurns: 2,
-                      child: Text('Score: $score2',
-                          style: TextStyle(
-                              fontSize: 23,
-                              color: currentPlayer == PLAYER_2
-                                  ? Colors.lightBlue
-                                  : Colors.black,
-                              fontWeight: FontWeight.bold)),
-                    ),
+                    const SizedBox(height: 16),
                   ],
                 ),
               ),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  RotatedBox(
-                    quarterTurns: 2,
-                    child: IconButton(
-                        onPressed: () {
-                          setState(() {
-                            initializeGame();
-                          });
-                        },
-                        icon: const Icon(Icons.restart_alt, size: 36)),
-                  ),
-                  const SizedBox(width: 16),
-                  AbsorbPointer(
-                      child: SizedBox(
-                          width: itemWidth / 5,
-                          height: itemWidth / 5 + itemWidth / 5,
-                          child: singleBox(11, listBoard[11].isMandari,
-                              isLeft: true)),
-                      absorbing: true),
-                  SizedBox(
-                    width: itemWidth,
-                    child: Column(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        AbsorbPointer(
-                          absorbing: currentPlayer == PLAYER_1,
-                          child: GridView.builder(
-                            physics: const NeverScrollableScrollPhysics(),
-                            shrinkWrap: true,
-                            itemCount: 5,
-                            gridDelegate:
-                                const SliverGridDelegateWithFixedCrossAxisCount(
-                                    crossAxisCount: 5, childAspectRatio: 1),
-                            itemBuilder: (BuildContext context, int index) {
-                              return singleBox(
-                                  index, listBoard[index].isMandari);
-                            },
-                          ),
-                        ),
-                        AbsorbPointer(
-                          absorbing: currentPlayer == PLAYER_2,
-                          child: GridView.builder(
-                            shrinkWrap: true,
-                            physics: const NeverScrollableScrollPhysics(),
-                            itemCount: 5,
-                            reverse: false,
-                            gridDelegate:
-                                const SliverGridDelegateWithFixedCrossAxisCount(
-                                    crossAxisCount: 5, childAspectRatio: 1),
-                            itemBuilder: (BuildContext context, int index) {
-                              return singleBox(
-                                  index + 6, listBoard[index + 6].isMandari);
-                            },
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                  AbsorbPointer(
-                      child: SizedBox(
-                          width: itemWidth / 5,
-                          height: itemWidth / 5 + itemWidth / 5,
-                          child: singleBox(5, listBoard[5].isMandari)),
-                      absorbing: true),
-                  const SizedBox(width: 16),
-                  IconButton(
-                      onPressed: () {
-                        setState(() {
-                          initializeGame();
-                        });
-                      },
-                      icon: const Icon(Icons.restart_alt, size: 36)),
-                ],
-              ),
-              AbsorbPointer(
-                absorbing: currentPlayer == PLAYER_2,
-                child: Row(
-                  crossAxisAlignment: CrossAxisAlignment.center,
-                  mainAxisAlignment: MainAxisAlignment.spaceAround,
-                  children: [
-                    Text('Player 1',
-                        style: TextStyle(
-                            fontSize: 23,
-                            fontWeight: FontWeight.bold,
-                            color: currentPlayer == PLAYER_1
-                                ? Colors.lightBlue
-                                : Colors.black)),
-                    Column(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      crossAxisAlignment: CrossAxisAlignment.center,
-                      children: [
-                        IconButton(
-                            onPressed: () {
-                              if (mIndex < 0) return;
-                              clickLeft(mIndex);
-                            },
-                            iconSize: 48,
-                            icon: const Icon(Icons.arrow_left)),
-                        const Text('DẢI SANG TRÁI')
-                      ],
-                    ),
-                    Column(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      crossAxisAlignment: CrossAxisAlignment.center,
-                      children: [
-                        IconButton(
-                            onPressed: () {
-                              if (mIndex < 0) return;
-                              clickRight(mIndex);
-                            },
-                            iconSize: 48,
-                            icon: const Icon(Icons.arrow_right, size: 48)),
-                        const Text('DẢI SANG PHẢI')
-                      ],
-                    ),
-                    Text('Score: $score1',
-                        style: TextStyle(
-                            fontSize: 23,
-                            color: currentPlayer == PLAYER_1
-                                ? Colors.lightBlue
-                                : Colors.black,
-                            fontWeight: FontWeight.bold)),
-                  ],
-                ),
-              ),
-              const SizedBox(height: 16),
-            ],
-          ),
-        ),
       ),
     );
   }
@@ -281,18 +319,24 @@ class _BackgroundState extends State<Background> {
     int i = index;
     int score = 0;
     listBoard[index].score = 0;
-
+    if (speed == null) {
+      speed = 1;
+    }
     try {
       while (boc > 0) {
         await Future.delayed(
-          const Duration(seconds: 1),
+          Duration(seconds: speed!),
           () {
             setState(() {
               var iYellow = i + 1 == 12 ? 0 : i + 1;
               var iBlue = i == 12 ? 0 : i;
               listBoard[iYellow].color = Colors.yellow;
-              final audioPlayer = AudioCache();
-              audioPlayer.play('assets/sounds/brick-dropped-on-other-bricks-14722.wav');
+              // final audioPlayer = AudioPlayer();
+              //  audioPlayer.play('assets/sounds/brickdrop.mp3');
+              if (turnSound)
+                AssetsAudioPlayer().open(
+                  Audio("assets/sounds/brick.mp3"),
+                );
               listBoard[iBlue].color =
                   listBoard[iBlue].isMandari ? Colors.red : Colors.blue;
             });
@@ -333,7 +377,10 @@ class _BackgroundState extends State<Background> {
         i = i + 1 == 12 ? 0 : i + 1;
         i = i + 1 == 12 ? 0 : i + 1;
         print('i sau khi ăn : $i');
-        if (listBoard[i].isMandari) score += 10;
+        if (pointOfMandarin != null) {
+          score += pointOfMandarin!;
+        } else
+          score += 10;
         score += listBoard[i].score;
         listBoard[i].score = 0;
       }
@@ -344,7 +391,9 @@ class _BackgroundState extends State<Background> {
         score2 += score;
       }
       changeTurn();
-    } catch (e) {}
+    } catch (e) {
+      print(e);
+    }
   }
 
   Future<void> directRight_cf(int index) async {
@@ -352,15 +401,21 @@ class _BackgroundState extends State<Background> {
     int i = index;
     int score = 0;
     listBoard[index].score = 0;
-
+    if (speed == null) {
+      speed = 1;
+    }
     try {
       while (boc > 0) {
         await Future.delayed(
-          const Duration(seconds: 1),
+          Duration(seconds: speed!),
           () {
             setState(() {
               var iYellow = i - 1 < 0 ? 11 : i - 1;
               var iBlue = i < 0 ? 11 : i;
+              if (turnSound)
+                AssetsAudioPlayer().open(
+                  Audio("assets/sounds/brick.mp3"),
+                );
               listBoard[iYellow].color = Colors.yellow;
               listBoard[iBlue].color =
                   listBoard[iBlue].isMandari ? Colors.red : Colors.blue;
@@ -393,7 +448,6 @@ class _BackgroundState extends State<Background> {
           }
         }
       }
-
       // Check ăn cờ
       //ô tiếp theo = 0 và k phải quan và ô tiếp theo nữa khác 0
       while (listBoard[i - 1 == -1 ? 11 : i - 1].score == 0 &&
@@ -401,11 +455,14 @@ class _BackgroundState extends State<Background> {
           listBoard[i - 2 == -1 ? 11 : i - 2].score != 0) {
         i = i - 1 == -1 ? 11 : i - 1;
         i = i - 1 == -1 ? 11 : i - 1;
-        if (listBoard[i].isMandari) score += 10;
+        if (pointOfMandarin != null) {
+          score += pointOfMandarin!;
+        } else
+          score += 10;
+
         score += listBoard[i].score;
         listBoard[i].score = 0;
       }
-
       if (currentPlayer == PLAYER_1) {
         score1 += score;
       } else {
@@ -440,11 +497,14 @@ class _BackgroundState extends State<Background> {
       showGameOverMessage(msg);
       return;
     }
-    if (temp.score == 0 && temp2.score == 0) {
+    if (temp.score + temp2.score == 0) {
       end();
       if (score1 > score2) {
         msg = 'Người chơi 1 chiến thắng với số điểm $score1'
             '\nNgười chơi 2 thua cuộc với số điểm $score2';
+      } else {
+        msg = 'Người chơi 2 chiến thắng với số điểm $score2'
+            '\nNgười chơi 1 thua cuộc với số điểm $score1';
       }
       showGameOverMessage(msg);
     }
@@ -584,7 +644,7 @@ class _BackgroundState extends State<Background> {
       // rai cho team 1
       scattered(1);
     }
-    if ((temp1 == 0) && (listBoard[0].score != 0 || listBoard[11].score != 0)) {
+    if ((temp2 == 0) && (listBoard[0].score != 0 || listBoard[11].score != 0)) {
       // rai cho team 2
       scattered(2);
     }
