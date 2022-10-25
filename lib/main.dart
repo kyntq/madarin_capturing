@@ -1,7 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:o_an_quan/models/board.dart';
 import 'package:o_an_quan/screens/menu.dart';
-import 'package:o_an_quan/widgets/background_widgets.dart';
 
 void main() {
   print('run');
@@ -14,6 +12,7 @@ class MyApp extends StatelessWidget {
     print('a');
     return MaterialApp(
       home: Scaffold(
+        backgroundColor: const Color(0xff0D723D),
         body: SafeArea(
           child: Menu(),
         ),

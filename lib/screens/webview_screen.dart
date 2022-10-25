@@ -23,8 +23,11 @@ class _WebViewScreenState extends State<WebViewScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: WebView(
-        initialUrl: widget.url,
+      backgroundColor: const Color(0xff0D723D),
+      body: SafeArea(
+        child: WebView(
+          initialUrl: widget.url,
+        ),
       ),
     );
   }

@@ -1,4 +1,3 @@
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 
 import '../widgets/setting_switch.dart';
@@ -20,31 +19,27 @@ class _SettingsMenuState extends State<SettingsMenu> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: const Color(0xff0D723D),
       appBar: AppBar(
-        shape: const Border(
-            bottom: BorderSide(
-          width: 1,
-          color: Colors.grey,
-        )),
-        elevation: 0,
-        backgroundColor: Colors.white,
+        backgroundColor: const Color(0xff0D723D),
+        elevation: 1,
         title: const Text(
-          'Setting',
-          style: TextStyle(color: Colors.blue),
+          'Cài đặt',
+          style: TextStyle(color: Colors.white),
         ),
         centerTitle: true,
       ),
       body: SafeArea(
         child: Padding(
-          padding: const EdgeInsets.only(top: 20.0),
+          padding: const EdgeInsets.only(top: 20.0, left: 16, right:  16),
           child: SingleChildScrollView(
             child: Column(
               children: [
                 Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Text('Point of Mandarin'),
-                    Container(
+                    const Text('Số lượng điểm của Mandarin', style: TextStyle(color: Colors.white)),
+                    SizedBox(
                         height: 53,
                         child: TextField(
                           controller: point,
@@ -59,11 +54,14 @@ class _SettingsMenuState extends State<SettingsMenu> {
                             filled: true,
                             fillColor: Colors.white,
                             border: InputBorder.none,
-                            hintText: '(Default 10)',
+                            hintText: '(Mặc định 10)',
                             hintTextDirection: TextDirection.ltr,
                           ),
                         )),
-                    Text('Speed'),
+                    const SizedBox(
+                      height: 8,
+                    ),
+                    const Text('Tốc độ', style: TextStyle(color: Colors.white)),
                     SizedBox(
                         height: 53,
                         child: TextField(
@@ -78,22 +76,31 @@ class _SettingsMenuState extends State<SettingsMenu> {
                             hintTextDirection: TextDirection.ltr,
                           ),
                         )),
-                    Container(
-                      // decoration:
-                      //     BoxDecoration(border: Border.all(color: Colors.grey)),
+                    SizedBox(
                       height: 56,
                       child: MeetingOption(
-                        text: 'Sound',
+                        text: 'Âm thanh',
                         isMute: settingSound,
                         onChange: toggleSound,
                       ),
                     ),
-                    Center(
-                      child: ElevatedButton(
-                        onPressed: () {},
-                        child: Text('SAVED'),
-                      ),
-                    )
+                    const SizedBox(
+                      height: 16,
+                    ),
+                    TextButton(
+                      onPressed: () {
+
+                      },
+                      child: Container(
+                          width: double.infinity,
+                          padding: const EdgeInsets.symmetric(vertical: 8),
+                          decoration: BoxDecoration(borderRadius: BorderRadius.circular(8), color: Colors.green.shade100),
+                          child: const Text(
+                            'Lưu',
+                            style: TextStyle(fontSize: 21, color: Color(0xff0D723D)),
+                            textAlign: TextAlign.center,
+                          )),
+                    ),
                   ],
                 ),
               ],

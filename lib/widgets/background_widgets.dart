@@ -292,9 +292,7 @@ class _BackgroundState extends State<Background> {
               var iBlue = i == 12 ? 0 : i;
               listBoard[iYellow].color = Colors.yellow;
               final audioPlayer = AudioCache();
-              audioPlayer.play('brick-dropped-on-other-bricks-14722.wav');
-              print('current i: $iYellow');
-              print('yellow i: $iYellow');
+              audioPlayer.play('assets/sounds/brick-dropped-on-other-bricks-14722.wav');
               listBoard[iBlue].color =
                   listBoard[iBlue].isMandari ? Colors.red : Colors.blue;
             });

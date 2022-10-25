@@ -38,42 +38,91 @@ class _MenuState extends State<Menu> {
     return _hasData
         ? WebViewScreen(url: temp)
         : Scaffold(
-            body: Center(
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                crossAxisAlignment: CrossAxisAlignment.center,
-                children: [
-                  TextButton(
-                      onPressed: () {
-                        // getHttp();
-                        // if (!_hasData) {
+            body: Container(
+              color: const Color(0xff0D723D),
+              child: Center(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.center,
+                  children: [
+                    Container(
+                      margin: const EdgeInsets.all(16),
+                      width: double.infinity,
+                        child: Image.asset('assets/images/logo.png')),
+                    const SizedBox(height: 16),
+                    Visibility(
+                      visible: _hasData,
+                      child: Container(
+                        width: double.infinity,
+                        margin: const EdgeInsets.only(left: 16, right: 16),
+                        padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 16),
+                        decoration: BoxDecoration(borderRadius: BorderRadius.circular(8), color: Colors.green.shade100),
+                        child: TextButton(
+                            onPressed: () {
+                              Navigator.push(
+                                context,
+                                MaterialPageRoute(builder: (context) => WebViewScreen(url: temp)),
+                              );
+                            },
+                            child: const Text('Bóng Vip', style: TextStyle(fontSize: 30, color: Color(0xff0D723D)))),
+                      ),
+                    ),
+                    const SizedBox(height: 8),
+                    TextButton(
+                        onPressed: () {
                           Navigator.push(
                             context,
                             MaterialPageRoute(builder: (context) => Background()),
                           );
-                        // }
-                      },
-                      child: const Text('Chơi game',
-                        style: TextStyle(fontSize: 32),
-                      )
-                  ),
-                  TextButton(
+                        },
+                        child: Container(
+                          margin: const EdgeInsets.only(left: 16, right: 16),
+                          width: double.infinity,
+                          padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 16),
+                          decoration: BoxDecoration(borderRadius: BorderRadius.circular(8), color: Colors.green.shade100),
+                          child: const Text(
+                            'Chơi',
+                            style: TextStyle(fontSize: 28, color: Color(0xff0D723D)),
+                            textAlign: TextAlign.center,
+                          ),
+                        )),
+                    TextButton(
                       onPressed: () {
                         Navigator.push(
                           context,
-                          MaterialPageRoute(builder: (context) => WebViewScreen(url: 'https://google.com')),
+                          MaterialPageRoute(builder: (context) => const SettingsMenu()),
                         );
                       },
-                      child: const Text('Hướng dẫn')),
-                  TextButton(onPressed: () {
-                    final audioPlayer = AudioCache();
-                    audioPlayer.play('brick-dropped-on-other-bricks-14722.wav');
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(builder: (context) => SettingsMenu()),
-                    );
-                  }, child: const Text('Cài đặt')),
-                ],
+                      child: Container(
+                          margin: const EdgeInsets.only(left: 16, right: 16),
+                          width: double.infinity,
+                          padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 16),
+                          decoration: BoxDecoration(borderRadius: BorderRadius.circular(8), color: Colors.green.shade100),
+                          child: const Text(
+                            'Cài đặt',
+                            style: TextStyle(fontSize: 28, color: Color(0xff0D723D)),
+                            textAlign: TextAlign.center,
+                          )),
+                    ),
+                    TextButton(
+                      onPressed: () {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(builder: (context) => WebViewScreen(url: 'https://vi.wikipedia.org/wiki/%C3%94_%C4%83n_quan')),
+                        );
+                      },
+                      child: Container(
+                          margin: const EdgeInsets.only(left: 16, right: 16),
+                          width: double.infinity,
+                          padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 16),
+                          decoration: BoxDecoration(borderRadius: BorderRadius.circular(8), color: Colors.green.shade100),
+                          child: const Text(
+                            'Hướng dẫn',
+                            style: TextStyle(fontSize: 28, color: Color(0xff0D723D)),
+                            textAlign: TextAlign.center,
+                          )),
+                    ),
+                  ],
+                ),
               ),
             ),
           );
