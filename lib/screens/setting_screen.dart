@@ -21,9 +21,15 @@ class _SettingsMenuState extends State<SettingsMenu> {
     final prefs = await SharedPreferences.getInstance();
 
     setState(() {
-      point.text = '${prefs.getInt('point')}';
-      speed.text = '${prefs.getInt('speed')}';
-      settingSound = prefs.getBool('sound')!;
+      if(prefs.getInt('point') == null) {
+        point.text = '10';
+        speed.text = '1';
+        settingSound = true;
+      } else {
+        point.text = '${prefs.getInt('point')}';
+        speed.text = '${prefs.getInt('speed')}';
+        settingSound = prefs.getBool('sound')!;
+      }
     });
   }
 
